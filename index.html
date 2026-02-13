@@ -3,329 +3,674 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jamabandi PDF Reader + Analytics (Online-only)</title>
+  <title>Jamabandi → SQLite DB (GitHub Pages)</title>
+
+  <!-- pdf.js -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.js"></script>
+  <!-- sql.js (SQLite in browser) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.min.js"></script>
 
   <style>
     :root{
-      --bg:#070b14; --panel:#0d1425; --card:#0f1b33; --border:#223458;
+      --bg:#0b1220; --card:#0f1b33; --border:#223458;
       --text:#e9eefc; --muted:#9fb0d0; --accent:#4cc9f0;
-      --good:#27c58b; --warn:#ffcc66; --bad:#ff6b8b;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-    h1{margin:10px 0 6px;font-size:28px}
-    .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
-    .grid{display:grid;gap:14px}
-    @media(min-width:980px){.grid{grid-template-columns: 420px 1fr; align-items:start}}
-    .panel{background:linear-gradient(180deg,var(--panel),#081024);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 18px 55px rgba(0,0,0,.45)}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    label{font-size:12px;color:var(--muted);display:block;margin:8px 0 6px}
-    input,button,textarea{
-      width:100%; border:1px solid var(--border); background:rgba(255,255,255,.04);
-      color:var(--text); border-radius:12px; padding:12px; outline:none;
+    .top{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+    h1{margin:0;font-size:20px}
+    h2{margin:0 0 10px 0;font-size:16px}
+    p{margin:6px 0}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .actions button{margin-left:8px}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;padding:12px;max-width:1100px;margin:0 auto}
+    @media(min-width:980px){.grid{grid-template-columns:1fr 1.2fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px}
+    .row{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+    input,textarea{
+      width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);
+      background:#0b162c;color:var(--text);outline:none
     }
-    textarea{min-height:96px;resize:vertical}
-    button{cursor:pointer;font-weight:700;letter-spacing:.2px}
-    .btn{background:rgba(76,201,240,.12);border:1px solid rgba(76,201,240,.4)}
-    .btn2{background:rgba(255,255,255,.06)}
-    .btnDanger{background:rgba(255,107,139,.12);border:1px solid rgba(255,107,139,.4)}
-    .pill{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
-    .status{margin-top:10px;font-size:13px;color:var(--muted)}
-    .status b{color:var(--text)}
-    canvas{width:100%;background:#0b1227;border:1px solid var(--border);border-radius:14px}
-    .viewerTop{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-    .viewerTop .pill{background:rgba(255,255,255,.03)}
-    .small{font-size:12px;color:var(--muted)}
-    .hr{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
-    .hit{background:rgba(255,204,102,.25);border:1px solid rgba(255,204,102,.35);padding:8px;border-radius:12px}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    button{
+      padding:10px 12px;border-radius:12px;border:1px solid var(--border);
+      background:#0b162c;color:var(--text);cursor:pointer
+    }
+    button:hover{border-color:var(--accent)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .status{margin-top:10px;font-size:13px}
+    .results{
+      margin-top:12px;max-height:420px;overflow:auto;border:1px solid var(--border);
+      border-radius:12px;padding:10px;background:#081226
+    }
+    .resultItem{padding:8px;border-bottom:1px dashed #1c2e4f;white-space:pre-wrap}
+    .resultItem:last-child{border-bottom:none}
+    .tabs{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .tab{padding:8px 10px;border-radius:999px}
+    .tab.active{border-color:var(--accent)}
+    .tabpane{display:none;margin-top:10px}
+    .tabpane.active{display:block}
+    .chk{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+    .foot{padding:12px;text-align:center}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:#0b162c;color:var(--muted);
+      font-size:12px
+    }
   </style>
-
-  <!-- ✅ ONLINE ONLY: PDF.js from CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script>
-    // ✅ worker from CDN
-    window.addEventListener("load", () => {
-      if (!window.pdfjsLib) {
-        alert("PDF.js failed to load from internet. Please check connection.");
-        return;
-      }
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-    });
-  </script>
 </head>
 
 <body>
-  <div class="wrap">
-    <h1>Jamabandi PDF Reader + Analytics</h1>
-    <div class="sub">
-      Online-only version: loads PDF.js via CDN. If internet is off, PDF won't load.
+  <header class="top">
+    <div>
+      <h1>Jamabandi → SQLite DB (Browser)</h1>
+      <p class="muted">Upload PDF → auto extract → query by heading/owner/khasra → download .db</p>
+      <div class="pill" id="dbState">DB: loading…</div>
     </div>
+    <div class="actions">
+      <button id="btnNewDb">New DB</button>
+      <button id="btnDownloadDb" disabled>Download DB</button>
+    </div>
+  </header>
 
-    <div class="grid">
-      <!-- LEFT -->
-      <div class="panel">
-        <div class="row" style="justify-content:space-between">
-          <div class="pill">NO index required</div>
-          <div class="pill">Rules from Firebase RTDB</div>
-        </div>
+  <main class="grid">
+    <section class="card">
+      <h2>1) Upload Jamabandi PDF</h2>
+      <input type="file" id="filePdf" accept="application/pdf" />
 
-        <div class="hr"></div>
-
-        <h3 style="margin:0 0 6px">Firebase RTDB Settings</h3>
-        <div class="small">Loads rules with GET: <span class="mono">/BASE_PATH/nodes/1.json</span></div>
-
-        <label>RTDB Base URL (no trailing slash)</label>
-        <input id="rtdbUrl" value="https://revnue-records-default-rtdb.asia-southeast1.firebasedatabase.app" />
-
-        <label>Base Path (folder only)</label>
-        <input id="basePath" value="hp_landcode_2023_v3" />
-
-        <label>Auth Token (optional)</label>
-        <input id="token" placeholder="Paste token if required" />
-
-        <label>Rules doc id (node id)</label>
-        <input id="docId" value="1" />
-
-        <div class="row" style="margin-top:10px">
-          <button class="btn" id="btnLoadRules" style="flex:1">Load Rules</button>
-          <button class="btn2" id="btnClearRules" style="flex:1">Clear</button>
-        </div>
-
-        <div id="rulesStatus" class="status">Rules: <b>not loaded</b></div>
-        <textarea id="rulesBox" placeholder="Rules JSON will appear here"></textarea>
-
-        <div class="hr"></div>
-
-        <h3 style="margin:0 0 6px">PDF Reader</h3>
-        <label>Load Jamabandi PDF</label>
-        <input type="file" id="pdfFile" accept="application/pdf"/>
-
-        <div class="row" style="margin-top:10px">
-          <button class="btn" id="btnLoadPdf" style="flex:1">Load PDF</button>
-          <button class="btnDanger" id="btnReset" style="flex:1">Reset</button>
-        </div>
-
-        <div id="pdfStatus" class="status">PDF: <b>not loaded</b></div>
-
-        <label>Search within PDF text (text PDFs)</label>
-        <input id="q" placeholder="e.g., khasra 1821, mutation, Narender, Kulvinder..." />
-
-        <div class="row" style="margin-top:10px">
-          <button class="btn2" id="btnSearch" style="flex:1">Search</button>
-          <button class="btn2" id="btnClearSearch" style="flex:1">Clear</button>
-        </div>
-
-        <div id="searchInfo" class="status">Search: <b>idle</b></div>
-        <div id="hits"></div>
+      <div class="row">
+        <label class="chk"><input type="checkbox" id="chkHindiMode" checked /> Hindi Mode (Jamabandi)</label>
+        <label class="chk"><input type="checkbox" id="chkDetectHeadings" checked /> Detect headings</label>
+        <label class="chk"><input type="checkbox" id="chkExtractEntities" checked /> Extract khasra/owners</label>
       </div>
 
-      <!-- RIGHT -->
-      <div class="panel">
-        <div class="viewerTop">
-          <span class="pill">Viewer</span>
-          <button class="btn2" id="btnPrev">◀ Prev</button>
-          <button class="btn2" id="btnNext">Next ▶</button>
-          <span class="pill">Page <b id="pageNow">-</b> / <b id="pageTotal">-</b></span>
-          <input id="pageGo" type="number" min="1" placeholder="Go" style="width:110px"/>
-          <button class="btn2" id="btnGo">Go</button>
-          <span class="pill" id="libInfo">PDF.js: <b>cdn</b></span>
+      <button id="btnImport" disabled>Import into DB</button>
+      <div id="importStatus" class="status muted"></div>
+    </section>
+
+    <section class="card">
+      <h2>2) Fetch / Query Logic</h2>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="tabHeading">By Heading</button>
+        <button class="tab" data-tab="tabOwner">By Owner</button>
+        <button class="tab" data-tab="tabKhasra">By Khasra</button>
+        <button class="tab" data-tab="tabSQL">SQL</button>
+      </div>
+
+      <div id="tabHeading" class="tabpane active">
+        <div class="row">
+          <input id="headingKey" placeholder="Heading key (e.g., जमाबंदी / खसरा / मालिक / 121)" />
+          <button id="btnGetHeading">Fetch</button>
         </div>
+        <p class="muted small">Tip: after import, try keys like: जमाबंदी, खसरा, मालिक, खतौनी.</p>
+      </div>
 
-        <canvas id="cv"></canvas>
-
-        <div class="hr"></div>
-        <div class="small">
-          If the PDF is scanned (image-only), text extraction will be empty. OCR required for search.
+      <div id="tabOwner" class="tabpane">
+        <div class="row">
+          <input id="ownerName" placeholder="Owner name (e.g., Narender Singh / नरेंद्र / कुलविंदर)" />
+          <button id="btnOwner">Search</button>
         </div>
       </div>
-    </div>
-  </div>
+
+      <div id="tabKhasra" class="tabpane">
+        <div class="row">
+          <input id="khasraNo" placeholder="Khasra no (e.g., 1825)" />
+          <button id="btnKhasra">Search</button>
+        </div>
+      </div>
+
+      <div id="tabSQL" class="tabpane">
+        <textarea id="sqlBox" rows="7">SELECT * FROM documents;</textarea>
+        <div class="row">
+          <button id="btnRunSQL">Run SQL</button>
+        </div>
+        <p class="muted small">Tables: documents, sections, content, entities, ownership</p>
+      </div>
+
+      <div id="results" class="results"></div>
+    </section>
+
+    <section class="card">
+      <h2>DB Summary</h2>
+      <div id="summary" class="muted">No DB loaded yet.</div>
+    </section>
+  </main>
+
+  <footer class="foot muted">
+    Works best for text-based PDFs. For scanned Jamabandi, you’ll need OCR later.
+  </footer>
 
 <script>
-/* =========================
-   Firebase RTDB rules loader
-   ========================= */
-const rtdbUrl = document.getElementById('rtdbUrl');
-const basePath = document.getElementById('basePath');
-const token   = document.getElementById('token');
-const docId   = document.getElementById('docId');
-const rulesBox = document.getElementById('rulesBox');
-const rulesStatus = document.getElementById('rulesStatus');
+/* global initSqlJs, pdfjsLib */
 
-document.getElementById('btnLoadRules').addEventListener('click', async ()=>{
-  const base = rtdbUrl.value.trim().replace(/\/+$/,'');
-  const path = basePath.value.trim().replace(/^\/+|\/+$/g,'');
-  const id = docId.value.trim();
-  if(!base || !path || !id){
-    alert('Please fill RTDB Base URL, Base Path, and Rules doc id.');
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.js";
+
+let SQL = null;
+let db = null;
+let importedDocId = null;
+
+const $ = (id)=>document.getElementById(id);
+
+const filePdf = $("filePdf");
+const btnImport = $("btnImport");
+const statusBox = $("importStatus");
+const resultsBox = $("results");
+const summaryBox = $("summary");
+const btnDownloadDb = $("btnDownloadDb");
+const dbState = $("dbState");
+
+function setDbState(msg){ dbState.textContent = "DB: " + msg; }
+
+function logStatus(msg){
+  statusBox.textContent = msg;
+}
+
+function showResults(rows){
+  resultsBox.innerHTML = "";
+  if (!rows || rows.length === 0){
+    resultsBox.innerHTML = `<div class="muted">No results.</div>`;
     return;
   }
-  const url = `${base}/${path}/nodes/${encodeURIComponent(id)}.json` +
-    (token.value.trim()? `?auth=${encodeURIComponent(token.value.trim())}` : '');
-
-  rulesStatus.innerHTML = 'Rules: <b>loading…</b>';
-  try{
-    const res = await fetch(url, {method:'GET'});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    rulesBox.value = JSON.stringify(data, null, 2);
-    rulesStatus.innerHTML = 'Rules: <b style="color:#27c58b">loaded</b>';
-  }catch(err){
-    rulesStatus.innerHTML = 'Rules: <b style="color:#ff6b8b">failed</b>';
-    alert('Failed to load rules.\n'+err.message+'\n\nURL:\n'+url);
-  }
-});
-
-document.getElementById('btnClearRules').addEventListener('click', ()=>{
-  rulesBox.value='';
-  rulesStatus.innerHTML = 'Rules: <b>not loaded</b>';
-});
-
-/* =========================
-   PDF viewer + search
-   ========================= */
-const pdfFile = document.getElementById('pdfFile');
-const pdfStatus = document.getElementById('pdfStatus');
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-const pageNowEl = document.getElementById('pageNow');
-const pageTotalEl = document.getElementById('pageTotal');
-
-let pdfDoc = null;
-let currentPage = 1;
-let pageTextCache = new Map();
-
-function setPdfStatus(txt, color){
-  pdfStatus.innerHTML = `PDF: <b style="color:${color||'#e9eefc'}">${txt}</b>`;
+  rows.forEach(r=>{
+    const div = document.createElement("div");
+    div.className = "resultItem";
+    div.textContent = (typeof r === "string") ? r : JSON.stringify(r, null, 2);
+    resultsBox.appendChild(div);
+  });
 }
 
-async function renderPage(n){
-  if(!pdfDoc) return;
-  currentPage = Math.max(1, Math.min(n, pdfDoc.numPages));
-  const page = await pdfDoc.getPage(currentPage);
-  const viewport = page.getViewport({ scale: 1.35 });
-
-  cv.width = Math.floor(viewport.width);
-  cv.height = Math.floor(viewport.height);
-
-  await page.render({ canvasContext: ctx, viewport }).promise;
-
-  pageNowEl.textContent = String(currentPage);
-  pageTotalEl.textContent = String(pdfDoc.numPages);
-
-  try{
-    const textContent = await page.getTextContent();
-    const text = textContent.items.map(it=>it.str).join(' ').replace(/\s+/g,' ').trim();
-    pageTextCache.set(currentPage, text);
-  }catch(e){
-    pageTextCache.set(currentPage, '');
-  }
+function normalizeKey(s){
+  return (s||"").toString().trim().replace(/\s+/g," ").toLowerCase();
 }
 
-document.getElementById('btnLoadPdf').addEventListener('click', async ()=>{
-  try{
-    if(!window.pdfjsLib){
-      alert("PDF.js not loaded. Check internet connection.");
-      return;
-    }
-    const f = pdfFile.files?.[0];
-    if(!f){ alert('Please choose a PDF first.'); return; }
+// ------------------------
+// DB schema
+// ------------------------
+const SCHEMA = `
+PRAGMA journal_mode=WAL;
 
-    setPdfStatus('loading…', '#ffcc66');
-    const buf = await f.arrayBuffer();
-    pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+CREATE TABLE IF NOT EXISTS documents (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  filename TEXT NOT NULL,
+  uploaded_at TEXT NOT NULL
+);
 
-    pageTextCache.clear();
-    currentPage = 1;
+CREATE TABLE IF NOT EXISTS sections (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  document_id INTEGER NOT NULL,
+  section_key TEXT NOT NULL,
+  heading TEXT NOT NULL,
+  page_start INTEGER NOT NULL,
+  page_end INTEGER NOT NULL
+);
 
-    setPdfStatus('loaded (' + pdfDoc.numPages + ' pages)', '#27c58b');
-    await renderPage(1);
-  }catch(err){
-    setPdfStatus('failed', '#ff6b8b');
-    alert('PDF failed to load: ' + err.message);
+CREATE TABLE IF NOT EXISTS content (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  section_id INTEGER NOT NULL,
+  page_no INTEGER NOT NULL,
+  line_no INTEGER NOT NULL,
+  text TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS entities (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  document_id INTEGER NOT NULL,
+  entity_type TEXT NOT NULL,
+  entity_key TEXT NOT NULL,
+  raw_text TEXT NOT NULL,
+  page_no INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ownership (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  document_id INTEGER NOT NULL,
+  owner_name TEXT NOT NULL,
+  share_value TEXT,
+  share_percent TEXT,
+  page_no INTEGER NOT NULL,
+  raw_line TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_sections_doc ON sections(document_id);
+CREATE INDEX IF NOT EXISTS idx_content_section ON content(section_id);
+CREATE INDEX IF NOT EXISTS idx_entities_doc_type ON entities(document_id, entity_type, entity_key);
+CREATE INDEX IF NOT EXISTS idx_ownership_doc_owner ON ownership(document_id, owner_name);
+`;
+
+async function init(){
+  setDbState("loading engine…");
+  SQL = await initSqlJs({
+    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${file}`
+  });
+  newDb();
+  wireUI();
+  setDbState("ready");
+}
+
+function newDb(){
+  db = new SQL.Database();
+  db.run(SCHEMA);
+  importedDocId = null;
+  btnDownloadDb.disabled = false;
+  updateSummary();
+  showResults([]);
+  logStatus("DB ready. Upload a PDF to import.");
+  setDbState("ready");
+}
+
+function exportDbBytes(){
+  return db.export();
+}
+
+function downloadDb(){
+  const bytes = exportDbBytes();
+  const blob = new Blob([bytes], {type:"application/octet-stream"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "jamabandi.db";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ------------------------
+// Heading detection (Jamabandi mode)
+// ------------------------
+function detectHeading(line, hindiMode){
+  const s = (line||"").trim();
+  if (!s) return null;
+
+  // Numbered headings: "121. Something"
+  const num = s.match(/^(\d{1,4})\.\s+(.+)$/);
+  if (num) return {key:num[1], heading:s};
+
+  // Hindi Jamabandi headings (extend as needed)
+  if (hindiMode){
+    if (/^जमाबंदी\b/i.test(s)) return {key:"जमाबंदी", heading:s};
+    if (/^खसरा\b/i.test(s)) return {key:"खसरा", heading:s};
+    if (/^खतौनी\b/i.test(s)) return {key:"खतौनी", heading:s};
+    if (/^खेवट\b/i.test(s)) return {key:"खेवट", heading:s};
+    if (/^मालिक\b/i.test(s)) return {key:"मालिक", heading:s};
+    if (/^नाम\b/i.test(s)) return {key:"नाम", heading:s};
   }
-});
 
-document.getElementById('btnReset').addEventListener('click', ()=>{
-  pdfDoc = null;
-  currentPage = 1;
-  pageTextCache.clear();
-  ctx.clearRect(0,0,cv.width,cv.height);
-  pageNowEl.textContent='-';
-  pageTotalEl.textContent='-';
-  setPdfStatus('not loaded');
-  document.getElementById('hits').innerHTML='';
-  document.getElementById('searchInfo').innerHTML='Search: <b>idle</b>';
-});
+  // ALL CAPS headings
+  if (/^[A-Z][A-Z\s\-\&]{6,}$/.test(s)) return {key:s.slice(0,40), heading:s};
 
-document.getElementById('btnPrev').addEventListener('click', ()=> renderPage(currentPage-1));
-document.getElementById('btnNext').addEventListener('click', ()=> renderPage(currentPage+1));
-document.getElementById('btnGo').addEventListener('click', ()=>{
-  const v = parseInt(document.getElementById('pageGo').value,10);
-  if(Number.isFinite(v)) renderPage(v);
-});
+  return null;
+}
 
-const searchInfo = document.getElementById('searchInfo');
-const hitsBox = document.getElementById('hits');
+// ------------------------
+// Entity extraction (best-effort)
+// ------------------------
+function extractEntitiesFromLine(line){
+  const out = [];
 
-function escHtml(s){ return s.replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m])); }
+  // khasra numbers (very broad): 1825, 40320, etc.
+  const khasraMatches = line.match(/\b\d{3,6}\b/g);
+  if (khasraMatches){
+    khasraMatches.slice(0, 10).forEach(k=>{
+      out.push({type:"khasra", key:k, raw:line});
+    });
+  }
 
-document.getElementById('btnSearch').addEventListener('click', async ()=>{
-  if(!pdfDoc){ alert('Load a PDF first.'); return; }
-  const q = document.getElementById('q').value.trim();
-  if(!q){ alert('Enter search text.'); return; }
+  // Hindi owner-ish phrases (basic)
+  const ownerHindi = line.match(/([अ-ह][अ-ह\s\.]{2,})/g);
+  if (ownerHindi){
+    ownerHindi.slice(0,2).forEach(name=>{
+      out.push({type:"owner", key:normalizeKey(name), raw:name.trim()});
+    });
+  }
 
-  searchInfo.innerHTML = 'Search: <b>scanning…</b>';
-  hitsBox.innerHTML = '';
+  // English names (basic)
+  const ownerEng = line.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})\b/g);
+  if (ownerEng){
+    ownerEng.slice(0,2).forEach(name=>{
+      out.push({type:"owner", key:normalizeKey(name), raw:name.trim()});
+    });
+  }
 
-  const qLow = q.toLowerCase();
-  let totalHits = 0;
+  return out;
+}
 
-  for(let p=1;p<=pdfDoc.numPages;p++){
-    if(!pageTextCache.has(p)){
-      try{
-        const page = await pdfDoc.getPage(p);
-        const textContent = await page.getTextContent();
-        const text = textContent.items.map(it=>it.str).join(' ').replace(/\s+/g,' ').trim();
-        pageTextCache.set(p, text);
-      }catch(e){
-        pageTextCache.set(p, '');
+// ownership extraction: "Name ... 567/12096 ... 4.68%"
+function extractOwnership(line){
+  const res = [];
+  const pct = line.match(/(\d+(?:\.\d+)?)\s*%/);
+  const frac = line.match(/\b(\d+)\s*\/\s*(\d+)\b/);
+
+  const name = line.match(/^([A-Za-zअ-ह][A-Za-zअ-ह\s\.\-]{2,60})/);
+
+  if (name && (pct || frac)){
+    res.push({
+      owner: name[1].trim(),
+      share_value: frac ? `${frac[1]}/${frac[2]}` : null,
+      share_percent: pct ? `${pct[1]}%` : null,
+      raw_line: line
+    });
+  }
+  return res;
+}
+
+// ------------------------
+// PDF text extraction (pdf.js)
+// ------------------------
+async function extractPdfPages(file){
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+
+  const pages = [];
+  for (let p=1; p<=pdf.numPages; p++){
+    const page = await pdf.getPage(p);
+    const txt = await page.getTextContent();
+    const strings = txt.items.map(it => (it.str||"").trim()).filter(Boolean);
+
+    // join; Jamabandi often has fragmented text -> we still store as lines chunks
+    const joined = strings.join(" ");
+    const lines = joined
+      .split(/\n+/)
+      .flatMap(x => x.split(/\s{2,}/))   // split on big gaps
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    pages.push({page:p, lines});
+  }
+  return pages;
+}
+
+// ------------------------
+// Import into DB
+// ------------------------
+function run(sql, params=[]){
+  const stmt = db.prepare(sql);
+  stmt.bind(params);
+  stmt.step();
+  stmt.free();
+}
+
+function all(sql, params=[]){
+  const stmt = db.prepare(sql);
+  stmt.bind(params);
+  const rows = [];
+  while (stmt.step()){
+    rows.push(stmt.getAsObject());
+  }
+  stmt.free();
+  return rows;
+}
+
+async function importPdf(){
+  const file = filePdf.files?.[0];
+  if (!file) return;
+
+  const hindiMode = $("chkHindiMode").checked;
+  const detectHeadings = $("chkDetectHeadings").checked;
+  const extractEntities = $("chkExtractEntities").checked;
+
+  setDbState("importing…");
+  logStatus("Reading PDF pages…");
+
+  const pages = await extractPdfPages(file);
+
+  // insert document
+  const uploadedAt = new Date().toISOString();
+  run(`INSERT INTO documents(filename, uploaded_at) VALUES (?, ?)`, [file.name, uploadedAt]);
+  const docRow = all(`SELECT id FROM documents ORDER BY id DESC LIMIT 1`)[0];
+  importedDocId = docRow?.id;
+
+  // create initial section
+  run(`INSERT INTO sections(document_id, section_key, heading, page_start, page_end)
+       VALUES (?, ?, ?, ?, ?)`,
+       [importedDocId, "PREFACE", "Before first heading", 1, 1]);
+  let currentSectionId = all(`SELECT id FROM sections ORDER BY id DESC LIMIT 1`)[0].id;
+
+  // bulk insert using transaction
+  db.run("BEGIN");
+  try{
+    for (const pg of pages){
+      const pageno = pg.page;
+      let lineNo = 0;
+
+      for (const rawLine of pg.lines){
+        lineNo++;
+        const line = (rawLine||"").trim();
+        if (!line) continue;
+
+        // heading?
+        if (detectHeadings){
+          const h = detectHeading(line, hindiMode);
+          if (h){
+            // close previous section
+            run(`UPDATE sections SET page_end=? WHERE id=?`, [pageno, currentSectionId]);
+
+            // start new section
+            run(`INSERT INTO sections(document_id, section_key, heading, page_start, page_end)
+                 VALUES (?, ?, ?, ?, ?)`,
+                 [importedDocId, h.key, h.heading, pageno, pageno]);
+            currentSectionId = all(`SELECT id FROM sections ORDER BY id DESC LIMIT 1`)[0].id;
+            continue;
+          }
+        }
+
+        // store content
+        run(`INSERT INTO content(section_id, page_no, line_no, text) VALUES (?, ?, ?, ?)`,
+            [currentSectionId, pageno, lineNo, line]);
+
+        // entities + ownership
+        if (extractEntities){
+          const ents = extractEntitiesFromLine(line);
+          for (const e of ents){
+            run(`INSERT INTO entities(document_id, entity_type, entity_key, raw_text, page_no)
+                 VALUES (?, ?, ?, ?, ?)`,
+                 [importedDocId, e.type, e.key, e.raw, pageno]);
+          }
+
+          const owns = extractOwnership(line);
+          for (const o of owns){
+            run(`INSERT INTO ownership(document_id, owner_name, share_value, share_percent, page_no, raw_line)
+                 VALUES (?, ?, ?, ?, ?, ?)`,
+                 [importedDocId, o.owner, o.share_value, o.share_percent, pageno, o.raw_line]);
+          }
+        }
       }
     }
-    const t = pageTextCache.get(p) || '';
-    const idx = t.toLowerCase().indexOf(qLow);
-    if(idx !== -1){
-      totalHits++;
-      const start = Math.max(0, idx - 80);
-      const end = Math.min(t.length, idx + q.length + 80);
-      const snippet = t.slice(start, end);
 
-      const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
-      const html = escHtml(snippet).replace(re, m=>`<mark style="background:rgba(255,204,102,.35);color:inherit;border-radius:6px;padding:0 3px">${escHtml(m)}</mark>`);
+    // close last section
+    run(`UPDATE sections SET page_end=? WHERE document_id=? AND id=?`,
+        [pages.length, importedDocId, currentSectionId]);
 
-      const div = document.createElement('div');
-      div.className='hit';
-      div.style.marginTop='10px';
-      div.innerHTML = `<div class="small">Page <b>${p}</b></div><div>${html}</div>`;
-      div.addEventListener('click', ()=>renderPage(p));
-      hitsBox.appendChild(div);
-    }
+    db.run("COMMIT");
+  }catch(err){
+    db.run("ROLLBACK");
+    setDbState("error");
+    logStatus("❌ Import failed: " + err.message);
+    throw err;
   }
 
-  searchInfo.innerHTML = totalHits
-    ? `Search: <b style="color:#27c58b">${totalHits} page(s) matched</b> (tap result to open)`
-    : 'Search: <b style="color:#ff6b8b">no matches</b>';
-});
+  setDbState("ready");
+  logStatus(`✅ Imported ${file.name} | Pages: ${pages.length} | Document ID: ${importedDocId}`);
+  updateSummary();
 
-document.getElementById('btnClearSearch').addEventListener('click', ()=>{
-  document.getElementById('q').value='';
-  hitsBox.innerHTML='';
-  searchInfo.innerHTML='Search: <b>idle</b>';
-});
+  // show sample headings
+  const hs = all(`SELECT section_key, heading, page_start, page_end
+                  FROM sections WHERE document_id=? ORDER BY id LIMIT 25`, [importedDocId]);
+  showResults(hs.map(x => x));
+}
+
+function updateSummary(){
+  if (!db){
+    summaryBox.textContent = "No DB loaded.";
+    return;
+  }
+  const docs = all(`SELECT COUNT(*) as n FROM documents`)[0].n;
+  const secs = all(`SELECT COUNT(*) as n FROM sections`)[0].n;
+  const lines = all(`SELECT COUNT(*) as n FROM content`)[0].n;
+  const ents = all(`SELECT COUNT(*) as n FROM entities`)[0].n;
+  const owns = all(`SELECT COUNT(*) as n FROM ownership`)[0].n;
+
+  summaryBox.textContent =
+    `Documents: ${docs}\nSections: ${secs}\nContent lines: ${lines}\nEntities: ${ents}\nOwnership rows: ${owns}\nActive document_id: ${importedDocId ?? "none"}`;
+}
+
+// ------------------------
+// Query APIs (UI buttons)
+// ------------------------
+function fetchByHeading(){
+  if (!importedDocId) return showResults(["Import a PDF first."]);
+  const key = $("headingKey").value.trim();
+  if (!key) return showResults(["Enter a heading key."]);
+
+  // find section(s) whose key/heading matches
+  const sec = all(
+    `SELECT id, section_key, heading, page_start, page_end
+     FROM sections
+     WHERE document_id=?
+       AND (LOWER(section_key)=LOWER(?) OR heading LIKE ?)
+     ORDER BY id LIMIT 20`,
+    [importedDocId, key, `%${key}%`]
+  );
+
+  if (sec.length === 0) return showResults(["No section found. Try: जमाबंदी / खसरा / मालिक / खतौनी"]);
+
+  // fetch content lines of first match (to keep UI light)
+  const sid = sec[0].id;
+  const lines = all(
+    `SELECT page_no, line_no, text
+     FROM content
+     WHERE section_id=?
+     ORDER BY page_no, line_no
+     LIMIT 400`,
+    [sid]
+  );
+
+  showResults([
+    {SECTION: sec[0]},
+    ...lines.map(r => `[p${r.page_no}:${r.line_no}] ${r.text}`)
+  ]);
+}
+
+function searchOwner(){
+  if (!importedDocId) return showResults(["Import a PDF first."]);
+  const name = $("ownerName").value.trim();
+  if (!name) return showResults(["Enter owner name."]);
+
+  // 1) ownership table (best)
+  const o = all(
+    `SELECT owner_name, share_value, share_percent, page_no, raw_line
+     FROM ownership
+     WHERE document_id=?
+       AND owner_name LIKE ?
+     ORDER BY page_no
+     LIMIT 80`,
+    [importedDocId, `%${name}%`]
+  );
+
+  // 2) fallback: content search
+  const c = all(
+    `SELECT s.section_key, c.page_no, c.text
+     FROM content c
+     JOIN sections s ON s.id = c.section_id
+     WHERE s.document_id=?
+       AND c.text LIKE ?
+     ORDER BY c.page_no
+     LIMIT 120`,
+    [importedDocId, `%${name}%`]
+  );
+
+  const out = [];
+  if (o.length) out.push({OWNERSHIP_MATCHES: o.length}, ...o);
+  if (c.length) out.push({CONTENT_MATCHES: c.length}, ...c.map(x=>`[${x.section_key}] p${x.page_no}: ${x.text}`));
+
+  showResults(out.length ? out : ["No match found. Try alternate spelling (Hindi/English)."]);
+}
+
+function searchKhasra(){
+  if (!importedDocId) return showResults(["Import a PDF first."]);
+  const k = $("khasraNo").value.trim();
+  if (!k) return showResults(["Enter khasra number."]);
+
+  const e = all(
+    `SELECT entity_key, raw_text, page_no
+     FROM entities
+     WHERE document_id=?
+       AND entity_type='khasra'
+       AND entity_key=?
+     ORDER BY page_no
+     LIMIT 80`,
+    [importedDocId, k]
+  );
+
+  const c = all(
+    `SELECT s.section_key, c.page_no, c.text
+     FROM content c
+     JOIN sections s ON s.id = c.section_id
+     WHERE s.document_id=?
+       AND c.text LIKE ?
+     ORDER BY c.page_no
+     LIMIT 120`,
+    [importedDocId, `%${k}%`]
+  );
+
+  const out = [];
+  if (e.length) out.push({ENTITY_MATCHES: e.length}, ...e);
+  if (c.length) out.push({CONTENT_MATCHES: c.length}, ...c.map(x=>`[${x.section_key}] p${x.page_no}: ${x.text}`));
+  showResults(out.length ? out : ["No match found."]);
+}
+
+function runSQL(){
+  const q = $("sqlBox").value.trim();
+  if (!q) return showResults(["Write SQL query."]);
+  try{
+    const rows = all(q);
+    showResults(rows);
+  }catch(err){
+    showResults(["SQL Error: " + err.message]);
+  }
+}
+
+// ------------------------
+// UI wiring
+// ------------------------
+function wireUI(){
+  $("btnNewDb").addEventListener("click", newDb);
+  $("btnDownloadDb").addEventListener("click", downloadDb);
+
+  filePdf.addEventListener("change", ()=>{
+    btnImport.disabled = !filePdf.files?.length;
+    logStatus(filePdf.files?.length ? "PDF selected. Click Import." : "Select a PDF.");
+  });
+
+  btnImport.addEventListener("click", async ()=>{
+    try{
+      btnImport.disabled = true;
+      logStatus("Starting import…");
+      await importPdf();
+    } finally {
+      btnImport.disabled = false;
+    }
+  });
+
+  $("btnGetHeading").addEventListener("click", fetchByHeading);
+  $("btnOwner").addEventListener("click", searchOwner);
+  $("btnKhasra").addEventListener("click", searchKhasra);
+  $("btnRunSQL").addEventListener("click", runSQL);
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll(".tabpane").forEach(p=>p.classList.remove("active"));
+      btn.classList.add("active");
+      $(btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  btnDownloadDb.disabled = false;
+}
+
+// Start
+init();
 </script>
-
 </body>
 </html>
