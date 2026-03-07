@@ -3,135 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NSO Training Hub - Command Center</title>
+    <title>NSO Master Dashboard - Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .module-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .module-card:hover { transform: translateY(-8px); shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15); }
-        .sidebar-item:hover { background: rgba(255,255,255,0.05); }
-        .active-module { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        body { font-family: 'Inter', 'Noto Sans Devanagari', sans-serif; overflow: hidden; background: #0f172a; }
+        .slide { display: none; height: 100vh; width: 100vw; animation: slideUp 0.5s ease-out; background: white; }
+        .slide.active { display: flex; flex-direction: column; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Persistent Footer */
+        .global-footer { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: #1e293b; color: white; 
+            padding: 15px 30px; z-index: 1000; 
+            display: flex; justify-content: center; align-items: center;
+            border-top: 4px solid #3b82f6;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.3);
+        }
+        .nav-item { 
+            padding: 10px 20px; border-radius: 12px; cursor: pointer; 
+            transition: 0.3s; display: flex; flex-direction: column; 
+            align-items: center; gap: 4px; color: #94a3b8;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: #3b82f6; color: white; }
+        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body>
 
-    <aside class="w-72 bg-slate-900 text-white flex flex-col sticky top-0 h-screen">
-        <div class="p-8">
-            <div class="flex items-center gap-3 mb-2">
-                <i class="fas fa-satellite-dish text-blue-400 text-2xl"></i>
-                <h1 class="font-bold text-xl tracking-tight">NSO Portal</h1>
+    <div id="presentation">
+        
+        <div class="slide active" data-id="0">
+            <div class="h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-blue-900 text-white p-10">
+                <div class="bg-blue-500 px-4 py-1 rounded-full text-[10px] font-bold uppercase mb-4">Module 01</div>
+                <h1 class="text-6xl font-black mb-4">e-SIGMA Portal</h1>
+                <p class="text-2xl opacity-70">User Roles, Task Allocation & Real-time Monitoring</p>
+                <button onclick="window.location.href='esigma.html'" class="mt-8 px-8 py-3 bg-white text-blue-900 rounded-full font-bold hover:bg-blue-50 transition">Launch File <i class="fas fa-external-link-alt ml-2"></i></button>
             </div>
-            <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Training Dashboard</p>
         </div>
 
-        <nav class="flex-1 px-4 space-y-1">
-            <a href="#" class="flex items-center gap-3 p-3 rounded-lg active-module text-blue-400">
-                <i class="fas fa-th-large w-5"></i> Dashboard Home
-            </a>
-            <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Modules</div>
-            <a href="esigma.html" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-400 hover:text-white transition">
-                <i class="fas fa-server w-5 text-blue-500"></i> e-SIGMA System
-            </a>
-            <a href="main.html" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-400 hover:text-white transition">
-                <i class="fas fa-file-signature w-5 text-orange-500"></i> PLFS 2025 (Intro)
-            </a>
-            <a href="main 2.html" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-400 hover:text-white transition">
-                <i class="fas fa-clipboard-check w-5 text-indigo-500"></i> Schedules 11-20
-            </a>
-            <a href="nic nco.html" class="sidebar-item flex items-center gap-3 p-3 rounded-lg text-slate-400 hover:text-white transition">
-                <i class="fas fa-tags w-5 text-emerald-500"></i> NIC & NCO Codes
-            </a>
-        </nav>
-
-        <div class="p-6 bg-slate-800/50 m-4 rounded-xl border border-slate-700">
-            <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Operational Area</h4>
-            <p class="text-sm font-semibold">Himachal Pradesh</p>
-            <p class="text-[10px] text-slate-500">Shimla Region</p>
-        </div>
-    </aside>
-
-    <main class="flex-1 p-10 overflow-y-auto">
-        <header class="flex justify-between items-start mb-12">
-            <div>
-                <h2 class="text-4xl font-black text-slate-800 tracking-tight">Training Command Center</h2>
-                <p class="text-slate-500 mt-2">Access individual survey modules and technical guidelines.</p>
+        <div class="slide" data-id="1">
+            <div class="h-full flex flex-col items-center justify-center bg-slate-900 text-white p-10">
+                <div class="bg-orange-600 px-4 py-1 rounded-full text-[10px] font-bold uppercase mb-4">Module 02</div>
+                <h1 class="text-6xl font-black mb-4">PLFS Main</h1>
+                <p class="text-2xl text-orange-400">Schedule 0.0PL & 10.4 Fundamentals</p>
+                <button onclick="window.location.href='main.html'" class="mt-8 px-8 py-3 bg-orange-600 text-white rounded-full font-bold hover:bg-orange-700 transition">Launch File <i class="fas fa-external-link-alt ml-2"></i></button>
             </div>
-            <div class="bg-white p-3 rounded-2xl shadow-sm border flex items-center gap-4">
-                <div class="text-right">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">System Status</p>
-                    <p class="text-xs font-bold text-green-600 uppercase">Online / Field-Sync</p>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                    <i class="fas fa-user-tie text-slate-600"></i>
-                </div>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            <div class="module-card bg-white p-8 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden group">
-                <div class="relative z-10">
-                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
-                        <i class="fas fa-laptop-medical text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-800 mb-2">e-SIGMA Portal</h3>
-                    <p class="text-slate-500 text-sm mb-6 leading-relaxed">Master the digital workflow: configuration, user management, and zone-wise task allocation.</p>
-                    <a href="esigma.html" class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-blue-700 transition">
-                        Open e-SIGMA <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
-                <i class="fas fa-network-wired absolute -right-4 -bottom-4 text-8xl text-slate-50 opacity-[0.03] group-hover:opacity-[0.08] transition"></i>
-            </div>
-
-            <div class="module-card bg-white p-8 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden group">
-                <div class="relative z-10">
-                    <div class="w-14 h-14 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-6">
-                        <i class="fas fa-calendar-alt text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-800 mb-2">PLFS 2025 Intro</h3>
-                    <p class="text-slate-500 text-sm mb-6 leading-relaxed">Understanding the 4-month rotational panel design and Schedule 0.0PL/10.4 listing fundamentals.</p>
-                    <a href="main.html" class="inline-flex items-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-orange-700 transition">
-                        Open PLFS Intro <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
-                <i class="fas fa-chart-line absolute -right-4 -bottom-4 text-8xl text-slate-50 opacity-[0.03] group-hover:opacity-[0.08] transition"></i>
-            </div>
-
-            <div class="module-card bg-white p-8 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden group">
-                <div class="relative z-10">
-                    <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
-                        <i class="fas fa-list-ol text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-800 mb-2">Detailed Schedules</h3>
-                    <p class="text-slate-500 text-sm mb-6 leading-relaxed">Technical deep-dive into Schedules 11-20, covering complex household data capture rules.</p>
-                    <a href="main 2.html" class="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-700 transition">
-                        Open Schedules <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
-                <i class="fas fa-file-invoice absolute -right-4 -bottom-4 text-8xl text-slate-50 opacity-[0.03] group-hover:opacity-[0.08] transition"></i>
-            </div>
-
-            <div class="module-card bg-white p-8 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden group">
-                <div class="relative z-10">
-                    <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
-                        <i class="fas fa-search-dollar text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-800 mb-2">NIC & NCO Codes</h3>
-                    <p class="text-slate-500 text-sm mb-6 leading-relaxed">National Industrial and Occupational classifications to ensure accurate employment tracking.</p>
-                    <a href="nic nco.html" class="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-emerald-700 transition">
-                        Open NIC/NCO <i class="fas fa-external-link-alt"></i>
-                    </a>
-                </div>
-                <i class="fas fa-id-card absolute -right-4 -bottom-4 text-8xl text-slate-50 opacity-[0.03] group-hover:opacity-[0.08] transition"></i>
-            </div>
-
         </div>
 
-        <footer class="mt-12 text-center text-slate-400 text-xs">
-            <p>Integrated Survey Training Portal &copy; 2026 | National Statistical Office (NSO)</p>
-        </footer>
-    </main>
+        <div class="slide" data-id="2">
+            <div class="h-full flex flex-col items-center justify-center bg-indigo-900 text-white p-10">
+                <div class="bg-indigo-500 px-4 py-1 rounded-full text-[10px] font-bold uppercase mb-4">Module 03</div>
+                <h1 class="text-6xl font-black mb-4">PLFS Main 2</h1>
+                <p class="text-2xl text-indigo-300">Technical Training: Slides 11-20</p>
+                <button onclick="window.location.href='main_2.html'" class="mt-8 px-8 py-3 bg-indigo-500 text-white rounded-full font-bold hover:bg-indigo-600 transition">Launch File <i class="fas fa-external-link-alt ml-2"></i></button>
+            </div>
+        </div>
+
+        <div class="slide" data-id="3">
+            <div class="h-full flex flex-col items-center justify-center bg-violet-900 text-white p-10">
+                <div class="bg-violet-500 px-4 py-1 rounded-full text-[10px] font-bold uppercase mb-4">Module 04</div>
+                <h1 class="text-6xl font-black mb-4">PLFS Main 3</h1>
+                <p class="text-2xl text-violet-300">Technical Training: Slides 21-30</p>
+                <button onclick="window.location.href='main_3.html'" class="mt-8 px-8 py-3 bg-violet-500 text-white rounded-full font-bold hover:bg-violet-600 transition">Launch File <i class="fas fa-external-link-alt ml-2"></i></button>
+            </div>
+        </div>
+
+        <div class="slide" data-id="4">
+            <div class="h-full flex flex-col items-center justify-center bg-emerald-900 text-white p-10">
+                <div class="bg-emerald-500 px-4 py-1 rounded-full text-[10px] font-bold uppercase mb-4">Module 05</div>
+                <h1 class="text-6xl font-black mb-4">NIC & NCO Codes</h1>
+                <p class="text-2xl text-emerald-300">Industry and Occupational Classifications</p>
+                <button onclick="window.location.href='nic_nco.html'" class="mt-8 px-8 py-3 bg-emerald-600 text-white rounded-full font-bold hover:bg-emerald-700 transition">Launch File <i class="fas fa-external-link-alt ml-2"></i></button>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="global-footer">
+        <div class="flex gap-2">
+            <div class="nav-item active" onclick="jump(0)" id="nav-0">
+                <i class="fas fa-desktop"></i>
+                <span class="nav-label">1. e-SIGMA</span>
+            </div>
+            <div class="nav-item" onclick="jump(1)" id="nav-1">
+                <i class="fas fa-file-invoice"></i>
+                <span class="nav-label">2. Main</span>
+            </div>
+            <div class="nav-item" onclick="jump(2)" id="nav-2">
+                <i class="fas fa-layer-group"></i>
+                <span class="nav-label">3. Main 2</span>
+            </div>
+            <div class="nav-item" onclick="jump(3)" id="nav-3">
+                <i class="fas fa-list-ol"></i>
+                <span class="nav-label">4. Main 3</span>
+            </div>
+            <div class="nav-item" onclick="jump(4)" id="nav-4">
+                <i class="fas fa-tags"></i>
+                <span class="nav-label">5. NIC NCO</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function jump(idx) {
+            current = idx;
+            // Update Slides
+            slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+            // Update Nav Items
+            document.querySelectorAll('.nav-item').forEach((item, i) => {
+                item.classList.toggle('active', i === idx);
+            });
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') jump((current + 1) % slides.length);
+            if (e.key === 'ArrowLeft') jump((current - 1 + slides.length) % slides.length);
+            if (e.key >= '1' && e.key <= '5') jump(parseInt(e.key) - 1);
+        });
+    </script>
 </body>
 </html>
