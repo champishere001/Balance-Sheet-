@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-SIGMA Portal - Dashboard, User Management & Task Allocation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #059669 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .slide-container {
+            min-height: 100vh;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .slide-container.active {
+            display: flex;
+            opacity: 1;
+        }
+        .nav-dot {
+            transition: all 0.3s ease;
+        }
+        .nav-dot.active {
+            transform: scale(1.3);
+            background-color: #3b82f6;
+        }
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .typing-effect::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        .flow-line {
+            stroke-dasharray: 10;
+            animation: dash 20s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .metric-card.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .metric-card.orange {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 overflow-hidden">
+
+    <!-- Navigation Dots -->
+    <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-50 space-y-3">
+        <button onclick="goToSlide(0)" class="nav-dot w-3 h-3 rounded-full bg-gray-300 active" title="Title"></button>
+        <button onclick="goToSlide(1)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Agenda"></button>
+        <button onclick="goToSlide(2)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Overview"></button>
+        <button onclick="goToSlide(3)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Why"></button>
+        <button onclick="goToSlide(4)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="User Mgmt"></button>
+        <button onclick="goToSlide(5)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="User Dashboard"></button>
+        <button onclick="goToSlide(6)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Task Alloc"></button>
+        <button onclick="goToSlide(7)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Task Visuals"></button>
+        <button onclick="goToSlide(8)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Main Dashboard"></button>
+        <button onclick="goToSlide(9)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Workflow"></button>
+        <button onclick="goToSlide(10)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Benefits"></button>
+        <button onclick="goToSlide(11)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Summary"></button>
+        <button onclick="goToSlide(12)" class="nav-dot w-3 h-3 rounded-full bg-gray-300" title="Q&A"></button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-gray-200 z-50">
+        <div id="progressBar" class="h-full gradient-bg transition-all duration-500" style="width: 7.7%"></div>
+    </div>
+
+    <!-- Slide 1: Title Slide -->
+    <div class="slide-container active gradient-bg items-center justify-center relative overflow-hidden" id="slide-0">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-20 left-20 w-64 h-64 border-4 border-white rounded-full pulse-ring"></div>
+            <div class="absolute bottom-20 right-20 w-96 h-96 border-4 border-white rounded-full pulse-ring" style="animation-delay: 0.5s"></div>
+        </div>
+        
+        <div class="text-center text-white z-10 px-8 max-w-5xl">
+            <div class="mb-6 inline-block p-4 bg-white/10 rounded-full backdrop-blur-sm">
+                <i class="fas fa-chart-line text-5xl"></i>
+            </div>
+            <h1 class="text-6xl font-bold mb-6 leading-tight typing-effect" id="mainTitle">e-SIGMA Portal Dashboard</h1>
+            <h2 class="text-3xl font-light mb-8 opacity-90">User Management & Task Allocation</h2>
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 inline-block">
+                <p class="text-xl mb-2">MoSPI के NSO Surveys के लिए Digital Platform</p>
+                <p class="text-lg opacity-80">Real-time Monitoring & Efficient Workflow</p>
+            </div>
+            <div class="mt-12 flex justify-center gap-8 text-sm opacity-75">
+                <span><i class="fas fa-calendar mr-2"></i>March 2026</span>
+                <span><i class="fas fa-map-marker-alt mr-2"></i>New Delhi</span>
+                <span><i class="fas fa-building mr-2"></i>MoSPI, Government of India</span>
+            </div>
+        </div>
+        
+        <button onclick="nextSlide()" class="absolute bottom-10 right-10 bg-white text-blue-900 px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform flex items-center gap-2">
+            शुरू करें <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- Slide 2: Agenda -->
+    <div class="slide-container items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 p-12" id="slide-1">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-gray-800 mb-12 text-center">आज का एजेंडा</h2>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="agenda-item hover-lift bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 cursor-pointer" onclick="highlightAgenda(this)">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xl">1</div>
+                            <div>
+                                <h3 class="font-semibold text-lg">e-SIGMA Overview</h3>
+                                <p class="text-gray-600 text-sm">प्लेटफॉर्म का परिचय</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agenda-item hover-lift bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500 cursor-pointer" onclick="highlightAgenda(this)">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-xl">2</div>
+                            <div>
+                                <h3 class="font-semibold text-lg">User Management</h3>
+                                <p class="text-gray-600 text-sm">यूजर प्रबंधन मॉड्यूल</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agenda-item hover-lift bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500 cursor-pointer" onclick="highlightAgenda(this)">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-xl">3</div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Task Allocation</h3>
+                                <p class="text-gray-600 text-sm">कार्य आवंटन प्रणाली</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="agenda-item hover-lift bg-white p-6 rounded-xl shadow-md border-l-4 border-orange-500 cursor-pointer" onclick="highlightAgenda(this)">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl">4</div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Dashboard Features</h3>
+                                <p class="text-gray-600 text-sm">डैशबोर्ड विशेषताएं</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agenda-item hover-lift bg-white p-6 rounded-xl shadow-md border-l-4 border-red-500 cursor-pointer" onclick="highlightAgenda(this)">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 font-bold text-xl">5</div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Real-time Monitoring</h3>
+                                <p class="text-gray-600 text-sm">रीयल-टाइम निगरानी</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agenda-item hover-lift bg-white p-6 rounded-xl shadow-md border-l-4 border-teal-500 cursor-pointer" onclick="highlightAgenda(this)">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-600 font-bold text-xl">6</div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Benefits & Best Practices</h3>
+                                <p class="text-gray-600 text-sm">लाभ और सर्वोत्तम प्रथाएं</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Overview -->
+    <div class="slide-container items-center justify-center bg-white p-12" id="slide-2">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8">e-SIGMA क्या है?</h2>
+            <div class="grid grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-600">
+                        <h3 class="text-xl font-bold text-blue-900 mb-2">Full Form</h3>
+                        <p class="text-gray-700">e-Survey Instrument and Generalised Multimodal Application</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <p class="text-gray-700">Cloud-based platform for NSS/NSO surveys (PLFS, ASI, ASUSE, CAPEX)</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <p class="text-gray-700">CAPI (Computer Assisted Personal Interviewing) + Peripheral Modules</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <p class="text-gray-700">Paperless data collection with real-time sync</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <p class="text-green-800 font-semibold"><i class="fas fa-clock mr-2"></i>Faster Publication: 90-120 days for annual surveys</p>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <svg viewBox="0 0 400 300" class="w-full">
+                        <!-- Flowchart -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" />
+                            </marker>
+                        </defs>
+                        
+                        <!-- Boxes -->
+                        <rect x="150" y="20" width="100" height="40" rx="5" fill="#3b82f6" class="hover-lift" style="cursor: pointer"/>
+                        <text x="200" y="45" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Survey Setup</text>
+                        
+                        <rect x="150" y="80" width="100" height="40" rx="5" fill="#10b981" class="hover-lift" style="cursor: pointer"/>
+                        <text x="200" y="105" text-anchor="middle" fill="white" font-size="12" font-weight="bold">User Mgmt</text>
+                        
+                        <rect x="150" y="140" width="100" height="40" rx="5" fill="#8b5cf6" class="hover-lift" style="cursor: pointer"/>
+                        <text x="200" y="165" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Task Alloc</text>
+                        
+                        <rect x="150" y="200" width="100" height="40" rx="5" fill="#f59e0b" class="hover-lift" style="cursor: pointer"/>
+                        <text x="200" y="225" text-anchor="middle" fill="white" font-size="12" font-weight="bold">CAPI</text>
+                        
+                        <rect x="150" y="260" width="100" height="30" rx="5" fill="#ef4444" class="hover-lift" style="cursor: pointer"/>
+                        <text x="200" y="280" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Dashboard</text>
+                        
+                        <!-- Arrows -->
+                        <line x1="200" y1="60" x2="200" y2="80" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)" class="flow-line"/>
+                        <line x1="200" y1="120" x2="200" y2="140" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead)" class="flow-line"/>
+                        <line x1="200" y1="180" x2="200" y2="200" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowhead)" class="flow-line"/>
+                        <line x1="200" y1="240" x2="200" y2="260" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)" class="flow-line"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Why -->
+    <div class="slide-container items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 p-12" id="slide-3">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-gray-800 mb-12 text-center">क्यों महत्वपूर्ण है?</h2>
+            
+            <div class="grid grid-cols-2 gap-8">
+                <!-- Before -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-red-500">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-times text-red-500 text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800">पहले (Before)</h3>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                            <span>Manual task allocation</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                            <span>Delayed data scrutiny</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                            <span>Unequal workload distribution</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                            <span>Data quality issues</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- After -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-green-500">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-green-500 text-xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800">e-SIGMA Solution</h3>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>Centralized control</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>Role-based access control</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>Real-time progress tracking</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span>Timely, reliable statistics</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-blue-600 text-white p-6 rounded-xl text-center">
+                <p class="text-xl font-semibold">Impact: Better policy-making through accurate, timely data</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: User Management -->
+    <div class="slide-container items-center justify-center bg-white p-12" id="slide-4">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8">User Management Module</h2>
+            
+            <div class="grid grid-cols-3 gap-6 mb-8">
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl hover-lift">
+                    <i class="fas fa-user-plus text-3xl mb-3"></i>
+                    <h3 class="font-bold text-lg">Add/Update/Delete</h3>
+                    <p class="text-sm opacity-90">Users को manage करें</p>
+                </div>
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl hover-lift">
+                    <i class="fas fa-user-shield text-3xl mb-3"></i>
+                    <h3 class="font-bold text-lg">Role Assignment</h3>
+                    <p class="text-sm opacity-90">FS, Supervisor, DS, Admin</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl hover-lift">
+                    <i class="fas fa-toggle-on text-3xl mb-3"></i>
+                    <h3 class="font-bold text-lg">Status Control</h3>
+                    <p class="text-sm opacity-90">Active/Inactive Toggle</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-xl overflow-hidden">
+                <h3 class="text-lg font-bold mb-4 text-gray-700">User List Table (Mock)</h3>
+                <table class="w-full text-left">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="p-3 rounded-tl-lg">ID</th>
+                            <th class="p-3">Name</th>
+                            <th class="p-3">Role</th>
+                            <th class="p-3">Zone</th>
+                            <th class="p-3">Survey</th>
+                            <th class="p-3 rounded-tr-lg">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="bg-white hover:bg-blue-50 transition-colors">
+                            <td class="p-3">001</td>
+                            <td class="p-3 font-medium">Rajesh Kumar</td>
+                            <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Field Staff</span></td>
+                            <td class="p-3">Delhi-North</td>
+                            <td class="p-3">PLFS 2026</td>
+                            <td class="p-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">● Active</span></td>
+                        </tr>
+                        <tr class="bg-white hover:bg-blue-50 transition-colors">
+                            <td class="p-3">002</td>
+                            <td class="p-3 font-medium">Priya Singh</td>
+                            <td class="p-3"><span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Supervisor</span></td>
+                            <td class="p-3">Delhi-South</td>
+                            <td class="p-3">ASI 2026</td>
+                            <td class="p-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">● Active</span></td>
+                        </tr>
+                        <tr class="bg-white hover:bg-blue-50 transition-colors">
+                            <td class="p-3">003</td>
+                            <td class="p-3 font-medium">Amit Sharma</td>
+                            <td class="p-3"><span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">DS User</span></td>
+                            <td class="p-3">Mumbai</td>
+                            <td class="p-3">CAPEX</td>
+                            <td class="p-3"><span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">○ Inactive</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: User Dashboard -->
+    <div class="slide-container items-center justify-center bg-gray-100 p-12" id="slide-5">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8">User Management Dashboard</h2>
+            
+            <div class="grid grid-cols-4 gap-6 mb-8">
+                <div class="metric-card text-white p-6 rounded-xl">
+                    <p class="text-sm opacity-80">Total Users</p>
+                    <p class="text-3xl font-bold" id="totalUsers">0</p>
+                    <i class="fas fa-users text-4xl opacity-20 absolute bottom-4 right-4"></i>
+                </div>
+                <div class="metric-card green text-white p-6 rounded-xl relative overflow-hidden">
+                    <p class="text-sm opacity-80">Active Users</p>
+                    <p class="text-3xl font-bold" id="activeUsers">0</p>
+                    <i class="fas fa-user-check text-4xl opacity-20 absolute bottom-4 right-4"></i>
+                </div>
+                <div class="metric-card orange text-white p-6 rounded-xl relative overflow-hidden">
+                    <p class="text-sm opacity-80">Field Staff</p>
+                    <p class="text-3xl font-bold">60%</p>
+                    <i class="fas fa-hard-hat text-4xl opacity-20 absolute bottom-4 right-4"></i>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border-2 border-blue-200">
+                    <p class="text-sm text-gray-600">Recent Logins</p>
+                    <p class="text-2xl font-bold text-blue-600">24</p>
+                    <p class="text-xs text-gray-500">Last hour</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-bold mb-4">Users by Role</h3>
+                    <canvas id="roleChart"></canvas>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-bold mb-4">Activity Log</h3>
+                    <div class="space-y-3 max-h-64 overflow-y-auto">
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span class="text-sm">Rajesh Kumar logged in - 2 mins ago</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span class="text-sm">New user added: Priya Singh - 15 mins ago</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                            <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                            <span class="text-sm">Role updated for Amit Sharma - 1 hour ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Task Allocation -->
+    <div class="slide-container items-center justify-center bg-white p-12" id="slide-6">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8">Task Allocation Module</h2>
+            
+            <div class="grid grid-cols-3 gap-6">
+                <div class="bg-gradient-to-b from-blue-50 to-white p-6 rounded-xl border border-blue-200 hover-lift">
+                    <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl mb-4 mx-auto">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-3">DS FSU Tagging</h3>
+                    <p class="text-gray-600 text-center text-sm">Designated Supervisor को First Stage Units (FSUs) assign करना</p>
+                </div>
+                
+                <div class="bg-gradient-to-b from-green-50 to-white p-6 rounded-xl border border-green-200 hover-lift">
+                    <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white text-2xl mb-4 mx-auto">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-3">Sample List Upload</h3>
+                    <p class="text-gray-600 text-center text-sm">Sample list upload और substitution management</p>
+                </div>
+                
+                <div class="bg-gradient-to-b from-purple-50 to-white p-6 rounded-xl border border-purple-200 hover-lift">
+                    <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-white text-2xl mb-4 mx-auto">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-3">Task Dispatch</h3>
+                    <p class="text-gray-600 text-center text-sm">Real-time में field staff को schedules भेजना</p>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-gray-50 p-6 rounded-xl">
+                <h3 class="text-lg font-bold mb-4">Workflow Integration</h3>
+                <div class="flex items-center justify-between">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-list text-blue-600 text-2xl"></i>
+                        </div>
+                        <p class="text-sm font-medium">Sample List</p>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 text-2xl"></i>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-tags text-green-600 text-2xl"></i>
+                        </div>
+                        <p class="text-sm font-medium">Tagging</p>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 text-2xl"></i>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-tasks text-purple-600 text-2xl"></i>
+                        </div>
+                        <p class="text-sm font-medium">Allocation</p>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400 text-2xl"></i>
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-mobile-alt text-orange-600 text-2xl"></i>
+                        </div>
+                        <p class="text-sm font-medium">Field Execution</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Task Visuals -->
+    <div class="slide-container items-center justify-center bg-gray-50 p-12" id="slide-7">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8">Task Allocation Dashboard</h2>
+            
+            <div class="grid grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-lg font-bold mb-4">Workload by Zone</h3>
+                    <canvas id="workloadChart"></canvas>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-red-500">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-600 text-sm">Pending Tasks</p>
+                                <p class="text-2xl font-bold text-red-600">23</p>
+                            </div>
+                            <i class="fas fa-exclamation-circle text-red-500 text-3xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-600 text-sm">Completed Today</p>
+                                <p class="text-2xl font-bold text-green-600">156</p>
+                            </div>
+                            <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-600 text-sm">In Progress</p>
+                                <p class="text-2xl font-bold text-blue-600">89</p>
+                            </div>
+                            <i class="fas fa-spinner text-blue-500 text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Main Dashboard -->
+    <div class="slide-container items-center justify-center bg-gray-900 p-12" id="slide-8">
+        <div class="max-w-7xl w-full">
+            <h2 class="text-4xl font-bold text-white mb-8">Central Monitoring Dashboard</h2>
+            
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <p class="text-gray-400 text-xs">National Completion</p>
+                    <p class="text-2xl font-bold text-green-400">78.5%</p>
+                    <div class="w-full bg-gray-700 h-2 rounded-full mt-2">
+                        <div class="bg-green-400 h-2 rounded-full" style="width: 78.5%"></div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <p class="text-gray-400 text-xs">Data Submitted</p>
+                    <p class="text-2xl font-bold text-blue-400">45,230</p>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                    <p class="text-gray-400 text-xs">Scrutinized</p>
+                    <p class="text-2xl font-bold text-purple-400">38,945</p>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-lg border border-red-900/50 border-2">
+                    <p class="text-gray-400 text-xs">Red Alerts</p>
+                    <p class="text-2xl font-bold text-red-500">12</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+                <div class="bg-gray-800 p-6 rounded-xl col-span-2">
+                    <h3 class="text-white font-bold mb-4">Survey Progress - State Wise</h3>
+                    <canvas id="stateChart"></canvas>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="bg-gray-800 p-4 rounded-xl">
+                        <h4 class="text-white font-semibold mb-3 text-sm">Recent Alerts</h4>
+                        <div class="space-y-2">
+                            <div class="bg-red-900/30 border border-red-500/30 p-3 rounded-lg flex items-center gap-2">
+                                <i class="fas fa-flag text-red-500"></i>
+                                <span class="text-red-200 text-sm">Abnormal data: District A</span>
+                            </div>
+                            <div class="bg-yellow-900/30 border border-yellow-500/30 p-3 rounded-lg flex items-center gap-2">
+                                <i class="fas fa-clock text-yellow-500"></i>
+                                <span class="text-yellow-200 text-sm">Overdue: 5 FSUs</span>
+                            </div>
+                            <div class="bg-blue-900/30 border border-blue-500/30 p-3 rounded-lg flex items-center gap-2">
+                                <i class="fas fa-info-circle text-blue-500"></i>
+                                <span class="text-blue-200 text-sm">New survey launched</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-4 rounded-xl">
+                        <h4 class="text-white font-semibold mb-3 text-sm">Hierarchy View</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center gap-2 text-gray-300">
+                                <i class="fas fa-building text-blue-400"></i>
+                                <span>HQ (National)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300 ml-4">
+                                <i class="fas fa-map text-green-400"></i>
+                                <span>State Level</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300 ml-8">
+                                <i class="fas fa-map-marker-alt text-purple-400"></i>
+                                <span>District Level</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-gray-300 ml-12">
+                                <i class="fas fa-user text-orange-400"></i>
+                                <span>DS Level</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Workflow -->
+    <div class="slide-container items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700 p-12" id="slide-9">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-white mb-12 text-center">End-to-End Workflow</h2>
+            
+            <div class="relative">
+                <!-- Timeline Line -->
+                <div class="absolute top-1/2 left-0 w-full h-1 bg-white/30 -translate-y-1/2"></div>
+                
+                <div class="grid grid-cols-6 gap-4 relative">
+                    <div class="text-center group cursor-pointer" onclick="highlightWorkflow(0)">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-cog text-blue-600"></i>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl text-white">
+                            <p class="font-bold text-sm">1. Survey Setup</p>
+                            <p class="text-xs opacity-80 mt-1">Sample Upload</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center group cursor-pointer" onclick="highlightWorkflow(1)">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-users text-green-600"></i>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl text-white">
+                            <p class="font-bold text-sm">2. User Mgmt</p>
+                            <p class="text-xs opacity-80 mt-1">Add Staff</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center group cursor-pointer" onclick="highlightWorkflow(2)">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-tasks text-purple-600"></i>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl text-white">
+                            <p class="font-bold text-sm">3. Task Alloc</p>
+                            <p class="text-xs opacity-80 mt-1">Tag FSUs</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center group cursor-pointer" onclick="highlightWorkflow(3)">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-mobile-alt text-orange-600"></i>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl text-white">
+                            <p class="font-bold text-sm">4. CAPI Entry</p>
+                            <p class="text-xs opacity-80 mt-1">Real-time Sync</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center group cursor-pointer" onclick="highlightWorkflow(4)">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-chart-line text-red-600"></i>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl text-white">
+                            <p class="font-bold text-sm">5. Monitoring</p>
+                            <p class="text-xs opacity-80 mt-1">Scrutiny</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center group cursor-pointer" onclick="highlightWorkflow(5)">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                            <i class="fas fa-check-double text-teal-600"></i>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl text-white">
+                            <p class="font-bold text-sm">6. Publication</p>
+                            <p class="text-xs opacity-80 mt-1">Data Release</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="workflowDetail" class="mt-12 bg-white/10 backdrop-blur-md p-6 rounded-xl text-white text-center">
+                <p class="text-lg">Click on any step above to see details</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Benefits -->
+    <div class="slide-container items-center justify-center bg-white p-12" id="slide-10">
+        <div class="max-w-6xl w-full">
+            <h2 class="text-4xl font-bold text-gray-800 mb-12 text-center">Benefits & Best Practices</h2>
+            
+            <div class="grid grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold text-blue-600 mb-6 flex items-center gap-3">
+                        <i class="fas fa-star"></i> Key Benefits
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 bg-blue-50 rounded-xl hover-lift">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Real-time Visibility</h4>
+                                <p class="text-gray-600 text-sm">Instant access to survey progress and reduced delays</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4 p-4 bg-green-50 rounded-xl hover-lift">
+                            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Balanced Workload</h4>
+                                <p class="text-gray-600 text-sm">Optimal resource allocation and better data quality</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4 p-4 bg-purple-50 rounded-xl hover-lift">
+                            <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">AI-like Alerts</h4>
+                                <p class="text-gray-600 text-sm">Built-in scrutiny and automatic anomaly detection</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4 p-4 bg-orange-50 rounded-xl hover-lift">
+                            <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Faster Results</h4>
+                                <p class="text-gray-600 text-sm">Monthly surveys in 15-30 days vs 3-6 months previously</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-bold text-green-600 mb-6 flex items-center gap-3">
+                        <i class="fas fa-check-double"></i> Best Practices
+                    </h3>
+                    <div class="bg-gray-50 p-6 rounded-xl space-y-4">
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                            <i class="fas fa-graduation-cap text-blue-500"></i>
+                            <span class="text-gray-700">Regular user training (Self-Learning module)</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                            <i class="fas fa-sync text-green-500"></i>
+                            <span class="text-gray-700">Mandatory status updates</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                            <i class="fas fa-mobile-alt text-purple-500"></i>
+                            <span class="text-gray-700">Use mobile CAPI for field efficiency</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                            <i class="fas fa-bell text-orange-500"></i>
+                            <span class="text-gray-700">Monitor alerts promptly</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                            <i class="fas fa-shield-alt text-red-500"></i>
+                            <span class="text-gray-700">Regular data backup and security checks</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Summary -->
+    <div class="slide-container items-center justify-center bg-gradient-to-br from-gray-900 to-blue-900 p-12" id="slide-11">
+        <div class="max-w-4xl w-full text-center text-white">
+            <h2 class="text-4xl font-bold mb-12">Summary</h2>
+            
+            <div class="grid grid-cols-3 gap-8 mb-12">
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                    <i class="fas fa-users text-4xl text-blue-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">User Management</h3>
+                    <p class="text-sm opacity-80">Secure & Role-based Access Control</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                    <i class="fas fa-tasks text-4xl text-green-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Task Allocation</h3>
+                    <p class="text-sm opacity-80">Efficient Work Distribution</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                    <i class="fas fa-chart-pie text-4xl text-purple-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Dashboard</h3>
+                    <p class="text-sm opacity-80">Real-time Insights & Control</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-blue-500 to-green-500 p-8 rounded-2xl">
+                <h3 class="text-2xl font-bold mb-4">e-SIGMA = Modern Survey Ecosystem</h3>
+                <p class="text-xl opacity-90">Goal: Timely, Accurate Official Statistics for India</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 13: Q&A -->
+    <div class="slide-container items-center justify-center gradient-bg p-12" id="slide-12">
+        <div class="text-center text-white max-w-3xl">
+            <div class="mb-8">
+                <i class="fas fa-comments text-6xl mb-4 opacity-80"></i>
+                <h2 class="text-5xl font-bold mb-4">Thank You</h2>
+                <h3 class="text-3xl font-light">Questions & Discussion</h3>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-md p-8 rounded-2xl mb-8">
+                <p class="text-lg mb-6">चर्चा के विषय:</p>
+                <div class="space-y-3 text-left inline-block">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-question-circle text-yellow-300"></i>
+                        <span>Specific survey queries (ASI/CAPEX/PLFS)?</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-question-circle text-yellow-300"></i>
+                        <span>Registration/Login assistance?</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-question-circle text-yellow-300"></i>
+                        <span>Technical troubleshooting?</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-center gap-6 text-sm opacity-75">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-globe"></i>
+                    <span>esigma.mospi.gov.in</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-building"></i>
+                    <span>MoSPI, Government of India</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md rounded-full px-6 py-3 shadow-lg flex items-center gap-4 z-50">
+        <button onclick="prevSlide()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+            <i class="fas fa-chevron-left text-gray-700"></i>
+        </button>
+        <span id="slideIndicator" class="text-sm font-medium text-gray-700 min-w-[80px] text-center">1 / 13</span>
+        <button onclick="nextSlide()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+            <i class="fas fa-chevron-right text-gray-700"></i>
+        </button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 13;
+        
+        // Initialize charts when slides are shown
+        let chartsInitialized = {};
+        
+        function goToSlide(n) {
+            // Hide current slide
+            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+            document.querySelectorAll('.nav-dot')[currentSlide].classList.remove('active');
+            
+            // Show new slide
+            currentSlide = n;
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            document.querySelectorAll('.nav-dot')[currentSlide].classList.add('active');
+            
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update indicator
+            document.getElementById('slideIndicator').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            // Initialize charts for specific slides
+            if (currentSlide === 5 && !chartsInitialized['role']) {
+                initRoleChart();
+                animateValue('totalUsers', 0, 1250, 2000);
+                animateValue('activeUsers', 0, 1180, 2000);
+            }
+            if (currentSlide === 7 && !chartsInitialized['workload']) {
+                initWorkloadChart();
+            }
+            if (currentSlide === 8 && !chartsInitialized['state']) {
+                initStateChart();
+            }
+            
+            // Typing effect for title slide
+            if (currentSlide === 0) {
+                typeWriter();
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 0) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        
+        // Touch support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                diff > 0 ? nextSlide() : prevSlide();
+            }
+        });
+        
+        // Chart initialization functions
+        function initRoleChart() {
+            const ctx = document.getElementById('roleChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Field Staff', 'Supervisors', 'DS Users', 'Admins'],
+                    datasets: [{
+                        data: [60, 25, 12, 3],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 12, padding: 15 }
+                        }
+                    }
+                }
+            });
+            chartsInitialized['role'] = true;
+        }
+        
+        function initWorkloadChart() {
+            const ctx = document.getElementById('workloadChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Delhi-N', 'Delhi-S', 'Mumbai', 'Chennai', 'Kolkata'],
+                    datasets: [{
+                        label: 'Completion %',
+                        data: [85, 62, 90, 75, 68],
+                        backgroundColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'],
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { callback: value => value + '%' }
+                        }
+                    }
+                }
+            });
+            chartsInitialized['workload'] = true;
+        }
+        
+        function initStateChart() {
+            const ctx = document.getElementById('stateChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Maharashtra',
+                        data: [20, 45, 70, 85],
+                        borderColor: '#3b82f6',
+                        tension: 0.4
+                    }, {
+                        label: 'UP',
+                        data: [15, 35, 55, 72],
+                        borderColor: '#10b981',
+                        tension: 0.4
+                    }, {
+                        label: 'Karnataka',
+                        data: [25, 50, 75, 90],
+                        borderColor: '#f59e0b',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: 'white' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+            chartsInitialized['state'] = true;
+        }
+        
+        // Animate numbers
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const increment = end > start ? 1 : -1;
+            const stepTime = Math.abs(Math.floor(duration / range));
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment * Math.ceil(range / 50);
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                obj.textContent = current.toLocaleString();
+            }, stepTime);
+        }
+        
+        // Typewriter effect
+        let typeWriterTimeout;
+        function typeWriter() {
+            const text = "e-SIGMA Portal Dashboard";
+            const element = document.getElementById('mainTitle');
+            element.textContent = '';
+            clearTimeout(typeWriterTimeout);
+            
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    typeWriterTimeout = setTimeout(type, 100);
+                }
+            }
+            type();
+        }
+        
+        // Agenda highlight
+        function highlightAgenda(element) {
+            document.querySelectorAll('.agenda-item').forEach(el => {
+                el.classList.remove('ring-4', 'ring-blue-400');
+            });
+            element.classList.add('ring-4', 'ring-blue-400');
+        }
+        
+        // Workflow detail
+        const workflowDetails = [
+            "Configure survey parameters, upload sample lists, and set up survey timelines",
+            "Add field staff, supervisors, and DS users with appropriate roles and permissions",
+            "Tag FSUs to Designated Supervisors and allocate tasks zone-wise",
+            "Field staff use CAPI application on tablets for real-time data collection",
+            "Monitor progress, scrutinize data, and receive alerts for anomalies",
+            "Final data validation, report generation, and official publication"
+        ];
+        
+        function highlightWorkflow(index) {
+            const detail = document.getElementById('workflowDetail');
+            detail.innerHTML = `<p class="text-xl font-semibold mb-2">Step ${index + 1}</p><p class="text-lg opacity-90">${workflowDetails[index]}</p>`;
+            detail.classList.add('scale-105');
+            setTimeout(() => detail.classList.remove('scale-105'), 200);
+        }
+        
+        // Initialize
+        window.onload = () => {
+            typeWriter();
+        };
+    </script>
+</body>
+</html>

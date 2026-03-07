@@ -1,0 +1,776 @@
+
+html_content = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revamped PLFS 2025 - Schedule 0.0PL & 10.4 Fundamentals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            overflow: hidden;
+        }
+        
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 40px 60px;
+            background: white;
+            position: relative;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Header Styles */
+        .slide-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            margin: -40px -60px 30px -60px;
+            border-bottom: 4px solid #f39c12;
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: #f39c12;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        h2 {
+            font-size: 1.8em;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            font-size: 1.4em;
+            color: #2a5298;
+            margin: 20px 0 10px 0;
+        }
+        
+        /* Content Styles */
+        .slide-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 1.1em;
+            line-height: 1.6;
+            border-bottom: 1px solid #eee;
+        }
+        
+        li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #f39c12;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .info-box {
+            background: #e8f4f8;
+            border-left: 5px solid #2a5298;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1e3c72;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tr:hover {
+            background: #e8f4f8;
+        }
+        
+        /* Title Slide Special */
+        .title-slide {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .title-slide h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .title-slide .subtitle {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .title-slide .meta {
+            font-size: 1.2em;
+            margin-top: 60px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        .logo-placeholder {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            border: 3px solid #f39c12;
+        }
+        
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.95);
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        button {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #f39c12;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .slide-counter {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            color: #1e3c72;
+            font-size: 1.1em;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: #f39c12;
+            transition: width 0.3s;
+            z-index: 1001;
+        }
+        
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .column {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 4px solid #2a5298;
+        }
+        
+        /* Agenda Specific */
+        .agenda-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-left: 4px solid #f39c12;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .agenda-item:hover {
+            transform: translateX(10px);
+            background: #fff9e6;
+        }
+        
+        .agenda-number {
+            background: #1e3c72;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .slide {
+                display: block !important;
+                page-break-after: always;
+                height: auto;
+            }
+            .nav-controls, .progress-bar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="presentation-container">
+        
+        <!-- Slide 1: Title Slide -->
+        <div class="slide title-slide active" data-slide="1">
+            <div class="logo-placeholder">🇮🇳</div>
+            <h1>Revamped PLFS 2025</h1>
+            <div class="subtitle">Schedule 0.0PL & Schedule 10.4 – Fundamentals & Guidelines</div>
+            <div class="meta">
+                <div style="font-size: 0.9em; margin-bottom: 10px;">Periodic Labour Force Survey (January 2025 onwards)</div>
+                <div style="font-size: 0.8em; opacity: 0.8;">National Statistics Office (MoSPI), Government of India</div>
+                <div style="margin-top: 20px; font-size: 0.7em;">March 2026</div>
+            </div>
+        </div>
+        
+        <!-- Slide 2: Agenda -->
+        <div class="slide" data-slide="2">
+            <div class="slide-number">2</div>
+            <div class="slide-header">
+                <h1>Agenda / Presentation Flow</h1>
+            </div>
+            <div class="slide-content">
+                <div class="agenda-item">
+                    <div class="agenda-number">1</div>
+                    <div>
+                        <strong>Introduction to Revamped PLFS 2025</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">Why the revamp? Key changes and improvements</div>
+                    </div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">2</div>
+                    <div>
+                        <strong>Fundamentals of Schedule 0.0PL</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">Slides 3–12: Listing, stratification, and household selection</div>
+                    </div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">3</div>
+                    <div>
+                        <strong>Schedule 10.4 – First Visit</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">Slides 13–22: Blocks, guidelines, and comprehensive data collection</div>
+                    </div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">4</div>
+                    <div>
+                        <strong>Schedule 10.4 – Revisit</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">Slides 23–29: Changes tracking and current weekly status</div>
+                    </div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">5</div>
+                    <div>
+                        <strong>Summary & Key Takeaways</strong>
+                        <div style="font-size: 0.9em; color: #666; margin-top: 5px;">Slide 30: Essential points for field implementation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Introduction -->
+        <div class="slide" data-slide="3">
+            <div class="slide-number">3</div>
+            <div class="slide-header">
+                <h1>Why PLFS was Revamped in 2025</h1>
+            </div>
+            <div class="slide-content">
+                <div class="highlight-box">
+                    <strong>Primary Objective:</strong> Enable higher-frequency labour force indicators with improved accuracy and granularity
+                </div>
+                
+                <ul>
+                    <li><strong>Higher Frequency Indicators:</strong> Monthly all-India CWS (Current Weekly Status), quarterly rural+urban CWS, and annual usual status estimates</li>
+                    <li><strong>Rotational Panel Design:</strong> 4 visits per household over 4 consecutive months for better trend capture</li>
+                    <li><strong>Enhanced Sample Size:</strong> 22,692 FSUs per year (12,504 rural + 10,188 urban)</li>
+                    <li><strong>Increased Household Coverage:</strong> 12 households per FSU (up from 8 in previous design)</li>
+                    <li><strong>Improved Representation:</strong> Better coverage of educated households through Second Stage Stratification (SSS)</li>
+                    <li><strong>Post-Census Continuity:</strong> Two-year cycle with frame updates ensuring data consistency</li>
+                </ul>
+                
+                <div class="info-box">
+                    <strong>Source:</strong> MoSPI Changes in PLFS Document (2025) | <strong>Effective:</strong> January 2025 onwards
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Rotational Panel Design -->
+        <div class="slide" data-slide="4">
+            <div class="slide-number">4</div>
+            <div class="slide-header">
+                <h1>Overview of Rotational Panel Design</h1>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Visit Structure</h3>
+                        <ul>
+                            <li><strong>First Visit:</strong> Comprehensive baseline data collection</li>
+                            <li><strong>Revisits 1-3:</strong> Change tracking + current status (Months 2-4)</li>
+                            <li><strong>Total Duration:</strong> 4 consecutive months per household</li>
+                            <li><strong>Panel Rotation:</strong> Fresh panels introduced monthly</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Overlap Benefits</h3>
+                        <ul>
+                            <li><strong>75% Month-to-Month Overlap:</strong> Ensures continuity in trend analysis</li>
+                            <li><strong>50% Quarter-to-Quarter Overlap:</strong> Stable quarterly estimates</li>
+                            <li><strong>Fresh Listing:</strong> Only in first month of new panel</li>
+                            <li><strong>Frame Updates:</strong> Continuous alignment with census frames</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <strong>Key Advantage:</strong> This design enables production of monthly unemployment rates while maintaining data quality through panel stability, balancing timeliness with statistical reliability.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Schedule 0.0PL Purpose -->
+        <div class="slide" data-slide="5">
+            <div class="slide-number">5</div>
+            <div class="slide-header">
+                <h1>Schedule 0.0PL – Purpose & When Used</h1>
+            </div>
+            <div class="slide-content">
+                <h2>Primary Function</h2>
+                <div class="highlight-box">
+                    Listing schedule for households in selected First Stage Units (FSUs) to enable scientific selection of sample households for Schedule 10.4
+                </div>
+                
+                <h2>When to Use Schedule 0.0PL</h2>
+                <ul>
+                    <li><strong>New Panel Introduction:</strong> Used ONLY when a new panel is introduced (first month of rotation)</li>
+                    <li><strong>Fresh Listing Required:</strong> Complete enumeration of all households in the selected FSU</li>
+                    <li><strong>Stratification Basis:</strong> Enables formation of Second Stage Strata (SSS) based on education levels</li>
+                    <li><strong>Sample Selection:</strong> Facilitates selection of 12 sample households per FSU for detailed survey</li>
+                </ul>
+                
+                <div class="info-box">
+                    <strong>Not Used in Revisits:</strong> During revisits (months 2-4), use existing listing or prepare fresh only if major structural changes occur in the FSU (e.g., natural disasters, large-scale migration)
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Schedule 0.0PL Structure (1/2) -->
+        <div class="slide" data-slide="6">
+            <div class="slide-number">6</div>
+            <div class="slide-header">
+                <h1>Schedule 0.0PL – Key Structural Elements (1/2)</h1>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Block 0: Descriptive Identification</h3>
+                        <ul>
+                            <li>State and District names/codes</li>
+                            <li>Village/Town identification</li>
+                            <li>Tehsil/Taluk/Block details</li>
+                            <li>Landmark information</li>
+                            <li>FSU location specifics</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Block 1: Identification Particulars</h3>
+                        <ul>
+                            <li>Sample Number (unique identifier)</li>
+                            <li>Sector Code: 1=Rural, 2=Urban</li>
+                            <li>NSS Region code</li>
+                            <li>Stratum and Sub-stratum numbers</li>
+                            <li>Sub-Unit (SU) and Sub-division details</li>
+                            <li>Second Stage Stratum (SSS) code</li>
+                            <li>Frame Code and Survey Code</li>
+                            <li>Month/Year and Panel identifiers</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <strong>Important Codes:</strong> Inhabited=1 | Casualty/Substitute cases documented with reason codes | Ensure all codes match master frame
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 7: Schedule 0.0PL Structure (2/2) -->
+        <div class="slide" data-slide="7">
+            <div class="slide-number">7</div>
+            <div class="slide-header">
+                <h1>Schedule 0.0PL – Key Structural Elements (2/2)</h1>
+            </div>
+            <div class="slide-content">
+                <h2>Geographic Formation Blocks</h2>
+                
+                <table>
+                    <tr>
+                        <th>Formation Type</th>
+                        <th>Criteria</th>
+                        <th>Action Required</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Hamlet/SU Formation (Rural)</strong></td>
+                        <td>Large villages with distinct pockets</td>
+                        <td>List all hamlets by population %, form SUs, randomly select one SU for survey</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sub-division Formation</strong></td>
+                        <td>Population ≥1,500 (or ≥750 special cases)</td>
+                        <td>List all sub-divisions, select one randomly using prescribed procedure</td>
+                    </tr>
+                </table>
+                
+                <h2>Block 5: Household Listing</h2>
+                <ul>
+                    <li><strong>Serial Number:</strong> Continuous numbering of all households</li>
+                    <li><strong>House Number:</strong> Physical address/location identifier</li>
+                    <li><strong>Head of Household:</strong> Name of primary member</li>
+                    <li><strong>Household Size:</strong> Total members usually residing</li>
+                    <li><strong>Secondary+ Educated Members:</strong> Count of members with education ≥ 10th standard (critical for SSS formation)</li>
+                </ul>
+                
+                <div class="info-box">
+                    <strong>Probe Thoroughly:</strong> Education information determines stratification. Verify certificates or ask multiple sources if uncertain.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 8: Second Stage Strata (SSS) -->
+        <div class="slide" data-slide="8">
+            <div class="slide-number">8</div>
+            <div class="slide-header">
+                <h1>Schedule 0.0PL – Second Stage Strata (SSS)</h1>
+            </div>
+            <div class="slide-content">
+                <div class="highlight-box">
+                    <strong>Basis:</strong> Members with general education ≥ Secondary level (10th standard pass and above)
+                </div>
+                
+                <div class="two-column">
+                    <div class="column">
+                        <h3>Rural Areas (3 SSS)</h3>
+                        <table>
+                            <tr>
+                                <th>SSS</th>
+                                <th>Criteria</th>
+                                <th>HH Selected</th>
+                            </tr>
+                            <tr>
+                                <td>SSS 1</td>
+                                <td>2+ educated members</td>
+                                <td>4 hh</td>
+                            </tr>
+                            <tr>
+                                <td>SSS 2</td>
+                                <td>Exactly 1 educated</td>
+                                <td>6 hh</td>
+                            </tr>
+                            <tr>
+                                <td>SSS 3</td>
+                                <td>0 educated</td>
+                                <td>2 hh</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="column">
+                        <h3>Urban Areas (4 SSS)</h3>
+                        <table>
+                            <tr>
+                                <th>SSS</th>
+                                <th>Criteria</th>
+                                <th>HH Selected</th>
+                            </tr>
+                            <tr>
+                                <td>SSS 1</td>
+                                <td>3+ educated</td>
+                                <td>4 hh</td>
+                            </tr>
+                            <tr>
+                                <td>SSS 2</td>
+                                <td>Exactly 2 educated</td>
+                                <td>3 hh</td>
+                            </tr>
+                            <tr>
+                                <td>SSS 3</td>
+                                <td>Exactly 1 educated</td>
+                                <td>3 hh</td>
+                            </tr>
+                            <tr>
+                                <td>SSS 4</td>
+                                <td>0 educated</td>
+                                <td>2 hh</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="info-box" style="margin-top: 20px;">
+                    <strong>Total:</strong> 12 households selected per FSU | <strong>Objective:</strong> Ensure adequate representation of educated households in labour force estimates
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 9: Household Selection Process -->
+        <div class="slide" data-slide="9">
+            <div class="slide-number">9</div>
+            <div class="slide-header">
+                <h1>Schedule 0.0PL – Household Selection Process</h1>
+            </div>
+            <div class="slide-content">
+                <h2>Step-by-Step Selection Procedure</h2>
+                
+                <div class="agenda-item">
+                    <div class="agenda-number">1</div>
+                    <div><strong>Complete Listing:</strong> Enumerate ALL households in selected SU/FSU without omission</div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">2</div>
+                    <div><strong>Education Count:</strong> For each household, count members with secondary education (≥10th standard)</div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">3</div>
+                    <div><strong>SSS Formation:</strong> Group households into respective SSS categories based on education count</div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">4</div>
+                    <div><strong>Cumulative Totals:</strong> Prepare cumulative list of households within each SSS</div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">5</div>
+                    <div><strong>Random Selection:</strong> Apply systematic random sampling using prescribed random numbers</div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-number">6</div>
+                    <div><strong>Final Sample:</strong> Select specified number of households from each SSS (total 12 hh)</div>
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>Quality Check:</strong> Verify that selected households are geographically distributed across the FSU to avoid clustering bias
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 10: Special Guidelines -->
+        <div class="slide" data-slide="10">
+            <div class="slide-number">10</div>
+            <div class="slide-header">
+                <h1>Schedule 0.0PL – Special Guidelines & Cases</h1>
+            </div>
+            <div class="slide-content">
+                <h2>Handling Special Situations</h2>
+                
+                <table>
+                    <tr>
+                        <th>Situation</th>
+                        <th>Guideline</th>
+                        <th>SSS Assignment</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Locked Households</strong></td>
+                        <td>Probe neighbors for information; make multiple visits at different times</td>
+                        <td>Default to SSS 3 (Rural) or SSS 4 (Urban) if education info unavailable</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Paying Guests</strong></td>
+                        <td>Often treated as separate single-member households if independently cooking</td>
+                        <td>Based on individual's education level</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Substitutes</strong></td>
+                        <td>Only during initial selection if original household refuses or is casualty</td>
+                        <td>Same SSS as original</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Approximate Population</strong></td>
+                        <td>For SU/hamlet formation, consult knowledgeable persons (sarpanch, teachers, anganwadi workers)</td>
+                        <td>N/A</td>
+                    </tr>
+                </table>
+                
+                <div class="info-box">
+                    <strong>Documentation:</strong> Record reasons for substitutions, locked households, and any deviations from standard procedure in remarks column
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>Critical:</strong> Never assume education levels based on appearance or occupation. Always verify through direct inquiry or documentation.
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="nav-controls">
+        <button id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">10</span>
+        </div>
+        <button id="nextBtn" onclick="changeSlide(1)">Next →</button>
+    </div>
+    
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 10;
+        
+        function updateSlide() {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            // Show current slide
+            document.querySelector(`[data-slide="${currentSlide}"]`).classList.add('active');
+            
+            // Update counter
+            document.getElementById('currentSlide').textContent = currentSlide;
+            
+            // Update buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+            
+            // Update progress bar
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+        
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 1 && newSlide <= totalSlides) {
+                currentSlide = newSlide;
+                updateSlide();
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            }
+        });
+        
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
