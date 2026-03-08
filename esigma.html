@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working of e-SIGMA - MoSPI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 50px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Title Slide */
+        .title-slide {
+            text-align: center;
+            background: radial-gradient(circle at center, #1e3a8a 0%, #0f172a 100%);
+        }
+
+        .title-slide h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .title-slide .subtitle {
+            font-size: 1.8rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .title-slide .org {
+            font-size: 1.3rem;
+            color: #60a5fa;
+            border: 2px solid #60a5fa;
+            padding: 15px 40px;
+            border-radius: 50px;
+        }
+
+        /* Content Slides */
+        .content-slide {
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .slide-header {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #60a5fa;
+            border-bottom: 4px solid #3b82f6;
+            padding-bottom: 15px;
+            width: 100%;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .content-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .content-card h3 {
+            color: #a78bfa;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .content-card p, .content-card li {
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .content-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-card li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .content-card li:before {
+            content: "▸";
+            color: #60a5fa;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Process Flow */
+        .process-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .process-flow:before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            z-index: 0;
+        }
+
+        .process-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 15px;
+            font-weight: bold;
+            border: 4px solid #1e293b;
+        }
+
+        .step-label {
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Feature Boxes */
+        .feature-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .feature-box {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 2px solid #334155;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-box:hover {
+            border-color: #60a5fa;
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-box h4 {
+            color: #f472b6;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .feature-box p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* Screenshot Simulation */
+        .screenshot-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            color: #333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin: 20px 0;
+        }
+
+        .screenshot-header {
+            background: #2563eb;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .mock-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .mock-table th {
+            background: #f1f5f9;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        .mock-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-allocated { background: #dbeafe; color: #1e40af; }
+
+        /* Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #60a5fa;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.95);
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid #334155;
+        }
+
+        .nav-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        .slide-counter {
+            color: #94a3b8;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .dash-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .dash-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .dash-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .dash-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* Workflow Diagram */
+        .workflow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .workflow-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(30, 41, 59, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .workflow-icon {
+            font-size: 2rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .workflow-content h4 {
+            color: #60a5fa;
+            margin-bottom: 5px;
+        }
+
+        .workflow-content p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+        }
+
+        .col h4 {
+            color: #a78bfa;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        /* Role Cards */
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .role-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px solid #475569;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .role-card h4 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+        }
+
+        .role-card ul {
+            text-align: left;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            list-style: none;
+        }
+
+        .role-card li {
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .role-card li:before {
+            content: "•";
+            color: #60a5fa;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: #3b82f6;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            color: #cbd5e1;
+        }
+
+        .highlight-box {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border-left: 5px solid #60a5fa;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 15px 0;
+        }
+
+        .highlight-box h4 {
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid, .feature-container, .stats-container, .role-grid, .two-col {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .slide-header {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation">
+    <!-- Slide 1: Title -->
+    <div class="slide active title-slide">
+        <h1>Working of e-SIGMA</h1>
+        <div class="subtitle">Electronic Survey of Income and General Miscellaneous Expenditure<br>Admin Panel & Survey Management System</div>
+        <div class="org">Ministry of Statistics and Programme Implementation</div>
+    </div>
+
+    <!-- Slide 2: Overview -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">System Overview</h2>
+        <div class="content-grid">
+            <div class="content-card">
+                <h3>🎯 What is e-SIGMA?</h3>
+                <p>A comprehensive web-based Admin Panel for managing Computer-Assisted Personal Interviews (CAPI) surveys conducted by MoSPI.</p>
+                <br>
+                <p>The system facilitates real-time survey management, team allocation, task distribution, and progress monitoring for the Periodic Labour Force Survey (PLFS) and other statistical surveys.</p>
+            </div>
+            <div class="content-card">
+                <h3>🔑 Key Functionalities</h3>
+                <ul>
+                    <li>User Management (Enumerators, Supervisors, ROs)</li>
+                    <li>Team Allocation & Task Distribution</li>
+                    <li>FSU (First Stage Unit) Assignment</li>
+                    <li>Real-time Dashboard & Monitoring</li>
+                    <li>Survey Progress Tracking</li>
+                    <li>Mobile APK Distribution</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Login & Access -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Access Control & Authentication</h2>
+        <div class="two-col">
+            <div class="col">
+                <div class="content-card">
+                    <h3>🔐 Secure Login Process</h3>
+                    <ul>
+                        <li>Role-based access control (RO User)</li>
+                        <li>Unique User IDs (e.g., RO.SML.1)</li>
+                        <li>Password protected entry</li>
+                        <li>CAPTCHA verification for security</li>
+                        <li>Session management</li>
+                    </ul>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <h4>Security Features</h4>
+                    <p>Multi-layer authentication ensures only authorized personnel access sensitive survey data and management functions.</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="screenshot-box">
+                    <div class="screenshot-header">🖥️ Login Interface</div>
+                    <p style="margin-bottom: 10px; color: #666;"><strong>URL:</strong> hsd.esigma.mospi.gov.in/PLFS/admin</p>
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
+                        <p style="color: #334155; margin-bottom: 10px;"><strong>Login Fields:</strong></p>
+                        <ul style="color: #475569; padding-left: 20px; font-size: 0.9rem;">
+                            <li>User Name (Pre-filled: RO.SML.1)</li>
+                            <li>Password Entry</li>
+                            <li>CAPTCHA Code Display</li>
+                            <li>CAPTCHA Input Field</li>
+                            <li>Login Button</li>
+                        </ul>
+                    </div>
+                    <p style="margin-top: 10px; color: #059669; font-size: 0.85rem;">✓ Government of India Ministry branding</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Dashboard -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Home Dashboard & Quick Links</h2>
+        <div class="workflow-container">
+            <div class="workflow-row">
+                <div class="workflow-icon">🏠</div>
+                <div class="workflow-content">
+                    <h4>Centralized Dashboard</h4>
+                    <p>Upon login, users access the main dashboard showing current survey status (PLFS 2025-26), notification intervals, and financial year details with start/end dates.</p>
+                </div>
+            </div>
+            
+            <div class="workflow-row">
+                <div class="workflow-icon">⚡</div>
+                <div class="workflow-content">
+                    <h4>Quick Links Module</h4>
+                    <p>Four primary action buttons: Download Mobile APK (for field enumerators), Task Allocation (assign FSUs), Self Learning (training materials), and View FSU Response (monitor submissions).</p>
+                </div>
+            </div>
+
+            <div class="workflow-row">
+                <div class="workflow-icon">📅</div>
+                <div class="workflow-content">
+                    <h4>Survey Year Selection</h4>
+                    <p>Dropdown menu to switch between different survey periods (e.g., PLFS 2025-26) with automatic data filtering based on selection.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: User Management -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">User Management System</h2>
+        <div class="content-grid">
+            <div class="content-card">
+                <h3>👥 Enumerator Management</h3>
+                <ul>
+                    <li>View all registered enumerators</li>
+                    <li>Employee ID tracking (ENM.SML.XXX)</li>
+                    <li>Role assignment: Enumerator (JSO)</li>
+                    <li>Status monitoring (Active/Inactive)</li>
+                    <li>Contact information & qualifications</li>
+                    <li>CSV export functionality</li>
+                </ul>
+            </div>
+            <div class="screenshot-box" style="max-height: 300px; overflow-y: auto;">
+                <div class="screenshot-header">📋 User List View</div>
+                <table class="mock-table">
+                    <thead>
+                        <tr>
+                            <th>Emp ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ENM.SML.10</td>
+                            <td>Raj Kumar</td>
+                            <td>Enumerator</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>ENM.SML.101</td>
+                            <td>Nishant</td>
+                            <td>Enumerator</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>ENM.SML.102</td>
+                            <td>Vimal Joshi</td>
+                            <td>Enumerator</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Team Allocation -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Team Allocation Process</h2>
+        <div class="process-flow" style="margin-bottom: 30px;">
+            <div class="process-step">
+                <div class="step-circle">1</div>
+                <div class="step-label">Select<br>Survey</div>
+            </div>
+            <div class="process-step">
+                <div class="step-circle">2</div>
+                <div class="step-label">Choose<br>Supervisor</div>
+            </div>
+            <div class="process-step">
+                <div class="step-circle">3</div>
+                <div class="step-label">Select<br>Enumerators</div>
+            </div>
+            <div class="process-step">
+                <div class="step-circle">4</div>
+                <div class="step-label">Allocate<br>Team</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="content-card">
+                <h3>📊 Allocation Status Tracking</h3>
+                <ul>
+                    <li><strong>Pending Allocation:</strong> Enumerators not yet assigned</li>
+                    <li><strong>Allocated Team:</strong> Active supervisor-enumerator pairs</li>
+                    <li>Real-time status updates</li>
+                    <li>Bulk allocation capability</li>
+                    <li>Download allocation lists</li>
+                </ul>
+            </div>
+            <div class="content-card">
+                <h3>👨‍💼 Supervisor Assignment</h3>
+                <ul>
+                    <li>Supervisors (SSO) manage teams</li>
+                    <li>Multiple enumerators per supervisor</li>
+                    <li>Hierarchical reporting structure</li>
+                    <li>Workload distribution (15-21 FSUs per supervisor)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Task Allocation -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">FSU Task Allocation</h2>
+        <div class="feature-container" style="margin-bottom: 30px;">
+            <div class="feature-box">
+                <div class="feature-icon">🎯</div>
+                <h4>Survey Selection</h4>
+                <p>PLFS 2025-26 configuration</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">📅</div>
+                <h4>Quarter & Month</h4>
+                <p>Q5, Month 15 selection</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">🏘️</div>
+                <h4>Sector & Panel</h4>
+                <p>Urban/Rural classification</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">🔄</div>
+                <h4>Visit Management</h4>
+                <p>Track multiple visits</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">👤</div>
+                <h4>Supervisor Assignment</h4>
+                <p>Link FSU to SSO</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">✅</div>
+                <h4>Bulk Assign</h4>
+                <p>Mass allocation tools</p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>FSU Assignment Workflow</h4>
+            <p>First Stage Units (FSUs) are assigned to supervisors based on geographic location (State, RO, SRO, District, Tehsil). The system tracks pending assignments and allocated FSUs separately for efficient workload management.</p>
+        </div>
+    </div>
+
+    <!-- Slide 8: Dashboard & Monitoring -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Real-time Monitoring Dashboard</h2>
+        <div class="screenshot-box" style="margin-bottom: 30px;">
+            <div class="screenshot-header">📊 PLFS FSU Wise Dashboard</div>
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <div class="dash-icon" style="background: #fee2e2;">📤</div>
+                    <div class="dash-number" style="color: #dc2626;">67</div>
+                    <div class="dash-label">Assigned to Enumerator</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon" style="background: #dbeafe;">🏛️</div>
+                    <div class="dash-number" style="color: #2563eb;">3</div>
+                    <div class="dash-label">Submitted by Enumerator</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon" style="background: #ffedd5;">↩️</div>
+                    <div class="dash-number" style="color: #ea580c;">0</div>
+                    <div class="dash-label">Return Back to Enumerator</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon" style="background: #dcfce7;">📥</div>
+                    <div class="dash-number" style="color: #16a34a;">0</div>
+                    <div class="dash-label">Submitted by Supervisor</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon" style="background: #f3f4f6;">👁️</div>
+                    <div class="dash-number" style="color: #059669;">0</div>
+                    <div class="dash-label">Accepted by DS</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon" style="background: #e5e7eb;">⏸️</div>
+                    <div class="dash-number" style="color: #6b7280;">18</div>
+                    <div class="dash-label">Not Assigned</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon" style="background: #fef3c7;">🏷️</div>
+                    <div class="dash-number" style="color: #d97706;">0</div>
+                    <div class="dash-label">Not Tagged with DS</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-icon" style="background: #fce7f3;">↪️</div>
+                    <div class="dash-number" style="color: #db2777;">0</div>
+                    <div class="dash-label">Return to Supervisor</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Data Flow -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Survey Data Flow Process</h2>
+        <div class="workflow-container">
+            <div class="workflow-row">
+                <div class="workflow-icon">1️⃣</div>
+                <div class="workflow-content">
+                    <h4>Assignment Phase</h4>
+                    <p>RO allocates FSUs to Supervisors (SSO) → Supervisors assign to Enumerators (JSO) via mobile APK</p>
+                </div>
+            </div>
+            <div class="workflow-row">
+                <div class="workflow-icon">2️⃣</div>
+                <div class="workflow-content">
+                    <h4>Data Collection</h4>
+                    <p>Enumerators conduct field surveys using mobile tablets → Real-time data entry with validation checks</p>
+                </div>
+            </div>
+            <div class="workflow-row">
+                <div class="workflow-icon">3️⃣</div>
+                <div class="workflow-content">
+                    <h4>Submission & Review</h4>
+                    <p>Enumerator submits → Supervisor reviews → Returns if errors → Submits to Data Supervisor (DS)</p>
+                </div>
+            </div>
+            <div class="workflow-row">
+                <div class="workflow-icon">4️⃣</div>
+                <div class="workflow-content">
+                    <h4>Acceptance & Processing</h4>
+                    <p>DS accepts valid data → Data processing → Report generation → Export to statistical databases</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Reporting -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Reports & Analytics</h2>
+        <div class="content-grid">
+            <div class="content-card">
+                <h3>📈 Available Reports</h3>
+                <ul>
+                    <li><strong>Detailed Report:</strong> FSU-wise comprehensive data</li>
+                    <li><strong>Summary Report:</strong> Aggregated statistics</li>
+                    <li><strong>Referred Back Report:</strong> Error tracking</li>
+                    <li><strong>Present Status Report:</strong> Current state overview</li>
+                    <li><strong>Monthly Recap:</strong> Periodic summaries</li>
+                </ul>
+            </div>
+            <div class="content-card">
+                <h3>🔍 Filter Capabilities</h3>
+                <ul>
+                    <li>Survey Year selection</li>
+                    <li>SCH_0.0 Status filtering</li>
+                    <li>FSU Status (All/Specific)</li>
+                    <li>Sector (Urban/Rural)</li>
+                    <li>Quarter & Month</li>
+                    <li>Panel & Visit number</li>
+                    <li>Date range selection</li>
+                    <li>DS and SRO filtering</li>
+                </ul>
+            </div>
+        </div>
+        <div class="highlight-box" style="margin-top: 20px;">
+            <h4>Export Functionality</h4>
+            <p>All reports support Excel/CSV export for further analysis. The system shows pagination (e.g., 1 to 10 of 88 entries) for handling large datasets efficiently.</p>
+        </div>
+    </div>
+
+    <!-- Slide 11: User Roles -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">User Roles & Responsibilities</h2>
+        <div class="role-grid">
+            <div class="role-card">
+                <h4>👔 RO (Regional Officer)</h4>
+                <ul>
+                    <li>System administration</li>
+                    <li>User management</li>
+                    <li>Team allocation</li>
+                    <li>FSU assignment to supervisors</li>
+                    <li>Dashboard monitoring</li>
+                    <li>Report generation</li>
+                </ul>
+            </div>
+            <div class="role-card">
+                <h4>👨‍💼 SSO (Supervisor)</h4>
+                <ul>
+                    <li>Team management</li>
+                    <li>FSU distribution to enumerators</li>
+                    <li>Data validation</li>
+                    <li>Quality checking</li>
+                    <li>Submit to DS</li>
+                    <li>Field coordination</li>
+                </ul>
+            </div>
+            <div class="role-card">
+                <h4>📱 JSO (Enumerator)</h4>
+                <ul>
+                    <li>Field data collection</li>
+                    <li>Mobile app usage</li>
+                    <li>Household interviews</li>
+                    <li>Real-time data entry</li>
+                    <li>Photo/documentation</li>
+                    <li>Submit to supervisor</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Technical Features -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Technical Capabilities</h2>
+        <div class="feature-container">
+            <div class="feature-box">
+                <div class="feature-icon">📱</div>
+                <h4>Mobile Integration</h4>
+                <p>APK download & sync</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">🌐</div>
+                <h4>Web-based Access</h4>
+                <p>Cloud-hosted platform</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">🔔</div>
+                <h4>Notifications</h4>
+                <p>Real-time alerts</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">🔍</div>
+                <h4>Search & Filter</h4>
+                <p>Advanced querying</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">📊</div>
+                <h4>Data Visualization</h4>
+                <p>Dashboard metrics</p>
+            </div>
+            <div class="feature-box">
+                <div class="feature-icon">💾</div>
+                <h4>Export Options</h4>
+                <p>CSV/Excel download</p>
+            </div>
+        </div>
+        <div class="stats-container" style="margin-top: 30px;">
+            <div class="stat-box">
+                <span class="stat-number">24/7</span>
+                <div class="stat-label">System Availability</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-number">Real-time</span>
+                <div class="stat-label">Data Sync</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-number">Multi-level</span>
+                <div class="stat-label">Security</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-number">Scalable</span>
+                <div class="stat-label">Architecture</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 13: Advantages -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Advantages of e-SIGMA</h2>
+        <div class="content-grid">
+            <div class="content-card">
+                <h3>⚡ Efficiency Gains</h3>
+                <ul>
+                    <li>Paperless survey administration</li>
+                    <li>Real-time monitoring eliminates delays</li>
+                    <li>Automated task allocation</li>
+                    <li>Instant report generation</li>
+                    <li>Reduced manual errors</li>
+                </ul>
+            </div>
+            <div class="content-card">
+                <h3>✅ Quality Assurance</h3>
+                <ul>
+                    <li>Built-in validation checks</li>
+                    <li>Multi-level verification (Enumerator→Supervisor→DS)</li>
+                    <li>GPS tracking of field visits</li>
+                    <li>Digital audit trails</li>
+                    <li>Consistent data standards</li>
+                </ul>
+            </div>
+            <div class="content-card">
+                <h3>📊 Transparency</h3>
+                <ul>
+                    <li>Real-time progress tracking</li>
+                    <li>Workload visibility</li>
+                    <li>Performance metrics</li>
+                    <li>Status updates for all stakeholders</li>
+                </ul>
+            </div>
+            <div class="content-card">
+                <h3>🔒 Data Security</h3>
+                <ul>
+                    <li>Role-based access</li>
+                    <li>Secure login protocols</li>
+                    <li>Encrypted data transmission</li>
+                    <li>Centralized data storage</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 14: Conclusion -->
+    <div class="slide content-slide">
+        <h2 class="slide-header">Conclusion</h2>
+        <div class="full-width" style="text-align: center;">
+            <div class="highlight-box" style="text-align: left; max-width: 900px; margin: 0 auto;">
+                <h4>Transforming Survey Administration</h4>
+                <p>e-SIGMA represents a complete digital transformation of India's statistical survey infrastructure. By integrating user management, task allocation, real-time monitoring, and quality control into a single platform, MoSPI has created an efficient, transparent, and scalable system for collecting critical socioeconomic data.</p>
+            </div>
+            
+            <div class="content-grid" style="margin-top: 40px; max-width: 900px;">
+                <div class="content-card">
+                    <h3>🎯 Impact</h3>
+                    <ul>
+                        <li>Faster data collection cycles</li>
+                        <li>Improved data quality</li>
+                        <li>Enhanced policy relevance</li>
+                        <li>Reduced operational costs</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h3>🚀 Future Ready</h3>
+                    <ul>
+                        <li>Scalable for multiple surveys</li>
+                        <li>Integration ready</li>
+                        <li>Mobile-first approach</li>
+                        <li>Real-time analytics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 15: Thank You -->
+    <div class="slide title-slide">
+        <h1>Thank You</h1>
+        <div class="subtitle">e-SIGMA: Digital Transformation in Official Statistics</div>
+        <div style="margin-top: 40px; color: #94a3b8;">
+            <p>Ministry of Statistics and Programme Implementation</p>
+            <p>Government of India</p>
+            <p style="margin-top: 20px; font-size: 1.1rem;">🌐 hsd.esigma.mospi.gov.in</p>
+        </div>
+    </div>
+</div>
+
+<div class="nav-controls">
+    <button class="nav-btn" onclick="prevSlide()">← Previous</button>
+    <span class="slide-counter"><span id="current">1</span> / <span id="total">15</span></span>
+    <button class="nav-btn" onclick="nextSlide()">Next →</button>
+    <button class="nav-btn" onclick="window.location.href='main.html';">Schedule Module</button>
+</div>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    document.getElementById('total').textContent = totalSlides;
+
+    function showSlide(n) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        slides[n].classList.add('active');
+        document.getElementById('current').textContent = n + 1;
+    }
+
+    function nextSlide() {
+        if (currentSlide < totalSlides - 1) {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+        if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+
+    function handleSwipe() {
+        if (touchEndX < touchStartX - 50) nextSlide();
+        if (touchEndX > touchStartX + 50) prevSlide();
+    }
+</script>
+
+</body>
+</html>
